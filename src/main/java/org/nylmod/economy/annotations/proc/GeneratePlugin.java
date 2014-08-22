@@ -12,12 +12,13 @@ import javax.lang.model.element.TypeElement;
 import java.text.MessageFormat;
 import java.util.Set;
 
-import static org.nylmod.economy.annotations.proc.utils.GenerationConstant.*;
 import static org.nylmod.economy.annotations.proc.utils.BukkitUtils.*;
+import static org.nylmod.economy.annotations.proc.utils.GenerationConstant.*;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 @SupportedAnnotationTypes("org.nylmod.economy.annotations.EnableCommandScan")
 public class GeneratePlugin extends AbstractProcessor{
+
 
     private Filer filer;
     private Messager messager;
@@ -35,11 +36,13 @@ public class GeneratePlugin extends AbstractProcessor{
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         commandsElements = roundEnv.getElementsAnnotatedWith(Command.class);
         Set<? extends Element> commandScanElements = roundEnv.getElementsAnnotatedWith(EnableCommandScan.class);
-        BukkitUtils.hasJustOneResult(commandScanElements);
 
         for (Element command : commandsElements) {
             generateExecutorForCommand(command);
         }
+
+        // Ensure we hav only one EnableCommandScan on the source
+        BukkitUtils.hasJustOneResult(commandScanElements);
         for (Element command : commandScanElements) {
             generatePluginLauncherClass(command);
         }
@@ -49,20 +52,29 @@ public class GeneratePlugin extends AbstractProcessor{
     private void generateExecutorForCommand(Element command) {
         String className = getClassName(command);
         String packageName = getPackageName(command);
+
+        String source = generateExecutorForCommandSource(command, className, packageName);
+        createNewJavaFile(filer, messager, className, packageName, source, COMMAND_SUFFIX);
+    }
+
+    private String generateExecutorForCommandSource(Element command, String className, String packageName) {
+        String sourcePermission;
         Command annotation = command.getAnnotation(Command.class);
-        boolean isAdminNeeded = command.getAnnotation(AdminPermission.class) != null;
+        boolean isOnlyAdminCommand = command.getAnnotation(AdminPermission.class) != null;
 
-        String sourcePermission = MessageFormat.format(isAdminNeeded ? COMMAND_EXECUTOR_PERMISSION_ADMIN : COMMAND_EXECUTOR_PERMISSION, annotation.permissionMessage(), annotation.permission() );
-
-        String source = MessageFormat.format(COMMAND_EXECUTOR_PATTERN, packageName, className, className, sourcePermission);
-        createNewJavaFile(filer, messager, className, packageName, source, "Executor");
+        if (isOnlyAdminCommand){
+            sourcePermission =  MessageFormat.format(COMMAND_EXECUTOR_PERMISSION_ADMIN, annotation.permissionMessage());
+        }else{
+            sourcePermission = MessageFormat.format(COMMAND_EXECUTOR_PERMISSION, annotation.permissionMessage(), annotation.permission() );
+        }
+        return MessageFormat.format(COMMAND_EXECUTOR_PATTERN, packageName, className, sourcePermission);
     }
 
     private void generatePluginLauncherClass(Element command) {
         String className = getClassName(command);
         String packageName = getPackageName(command);
         String source = generatePluginSourceCode(className, packageName);
-        createNewJavaFile(filer, messager, className, packageName, source, "Launcher");
+        createNewJavaFile(filer, messager, className, packageName, source, PLUGIN_SUFFIX);
     }
 
     private String generatePluginSourceCode(String className, String packageName) {

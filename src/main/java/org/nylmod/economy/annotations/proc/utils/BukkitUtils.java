@@ -5,7 +5,10 @@ import org.nylmod.economy.annotations.Command;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
-import javax.tools.*;
+import javax.tools.Diagnostic;
+import javax.tools.FileObject;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardLocation;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Set;
@@ -20,7 +23,7 @@ public class BukkitUtils {
 
     public static void createNewPluginConfigFile(Filer filer, Messager messager, String sourceCode) {
         try {
-            messager.printMessage(Diagnostic.Kind.OTHER, "Generate Plugin.yml file");
+            messager.printMessage(Diagnostic.Kind.NOTE, "Generate Plugin.yml file");
 
             FileObject sourceFile = filer.createResource(StandardLocation.SOURCE_OUTPUT, "", "plugin.yml");
             Writer writer = sourceFile.openWriter();

@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created on 05/08/2014.
+ * Create file plugin.yml
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
