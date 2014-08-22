@@ -32,7 +32,7 @@ public class BukkitUtils {
     }
 
     public static String generateCommandYml(Command commd) {
-        return "    "+commd.value() + ":\n        description: "+commd.description()+"\n" +
+        return "    "+commd.name() + ":\n        description: "+commd.description()+"\n" +
                 "        usage: "+ commd.usage()+"\n        permission-message: "+commd.permissionMessage()+"\n";
     }
 

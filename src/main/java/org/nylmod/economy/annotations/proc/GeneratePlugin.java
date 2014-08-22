@@ -71,7 +71,7 @@ public class GeneratePlugin extends AbstractProcessor{
 
         for (Element command : commandsElements) {
             Command commandAnot = command.getAnnotation(Command.class);
-            String commandSource =  MessageFormat.format(GET_COMMAND, commandAnot.value(),command.getSimpleName());
+            String commandSource =  MessageFormat.format(GET_COMMAND, commandAnot.name(),command.getSimpleName());
             sourceCode.append(commandSource);
         }
         return sourceCode.append("\t}\n}").toString();
