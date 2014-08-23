@@ -78,7 +78,7 @@ public class GeneratePlugin extends AbstractProcessor{
     }
 
     private String generatePluginSourceCode(String className, String packageName) {
-        String header = MessageFormat.format(COMMAND_EXECUTOR_HEADER, packageName, generateImportCommand(), className);
+        String header = MessageFormat.format(COMMAND_EXECUTOR_HEADER, packageName, generateImportCommandSource(), className);
         StringBuilder sourceCode = new StringBuilder(header);
 
         for (Element command : commandsElements) {
@@ -89,7 +89,7 @@ public class GeneratePlugin extends AbstractProcessor{
         return sourceCode.append("\t}\n}").toString();
     }
 
-    private String generateImportCommand() {
+    private String generateImportCommandSource() {
         StringBuilder sourceCode = new StringBuilder();
         for (Element command : commandsElements) {
             sourceCode.append(MessageFormat.format(IMPORT_EXECUTOR, command.getEnclosingElement(), command.getSimpleName()));

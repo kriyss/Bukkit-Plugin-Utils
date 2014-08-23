@@ -41,10 +41,15 @@ public class BukkitUtils {
 
     public static void createNewJavaFile(Filer filer, Messager messager, String className, String packageName, String sourceCode, String suffix) {
         try {
-            JavaFileObject sourceFile = filer.createSourceFile(packageName +"."+ className + suffix);
+            String name = packageName + "." + className + suffix;
+
+            JavaFileObject sourceFile = filer.createSourceFile(name);
+
             Writer writer = sourceFile.openWriter();
             writer.write(sourceCode);
             writer.close();
+
+            messager.printMessage(Diagnostic.Kind.NOTE, "generation of "+ name + " done!!");
 
         } catch (IOException e) {
             messager.printMessage(Diagnostic.Kind.ERROR, e.getMessage());
