@@ -1,4 +1,4 @@
-package org.nylmod.economy.annotations.proc.utils;
+package org.kriyss.bukkit.utils.annotations.proc.utils;
 
 public interface GenerationConstant {
 

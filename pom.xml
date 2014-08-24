@@ -13,7 +13,7 @@
         <bukkit.version>RELEASE</bukkit.version>
         <!-- Project properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.javaVersion>1.8</project.build.javaVersion>
+        <project.build.javaVersion>1.7</project.build.javaVersion>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.dir.generated>${project.basedir}/src/main/generated</project.dir.generated>
     </properties>
