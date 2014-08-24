@@ -40,11 +40,11 @@ public class ArgEntity {
 
     @Override
     public String toString() {
-        return "ArgEntity{" +
-                "name='" + name + '\'' +
-                ", required=" + required +
-                ", min=" + min +
-                ", max=" + max +
+        return "\nArgEntity{" +
+                "\nname='" + name + '\'' +
+                ",\nrequired=" + required +
+                ",\nmin=" + min +
+                ",\nmax=" + max +
                 '}';
     }
 }

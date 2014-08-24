@@ -1,5 +1,6 @@
 package org.kriyss.bukkit.utils.annotations.proc;
 
+import org.kriyss.bukkit.utils.annotations.Plugin;
 import org.kriyss.bukkit.utils.annotations.command.Arg;
 import org.kriyss.bukkit.utils.annotations.command.Command;
 import org.kriyss.bukkit.utils.annotations.command.CommandGroup;
@@ -8,6 +9,8 @@ import org.kriyss.bukkit.utils.annotations.permission.Console;
 import org.kriyss.bukkit.utils.annotations.permission.Permission;
 import org.kriyss.bukkit.utils.annotations.proc.entity.ArgEntity;
 import org.kriyss.bukkit.utils.annotations.proc.entity.CommandEntity;
+import org.kriyss.bukkit.utils.annotations.proc.entity.CommandGroupEntity;
+import org.kriyss.bukkit.utils.annotations.proc.entity.PluginEntity;
 import org.kriyss.bukkit.utils.annotations.proc.entity.builder.ArgEntityBuilder;
 import org.kriyss.bukkit.utils.annotations.proc.entity.builder.CommandEntityBuilder;
 import org.kriyss.bukkit.utils.annotations.proc.entity.builder.CommandGroupEntityBuilder;
@@ -23,6 +26,7 @@ public class GeneratePlugin extends AbstractProcessor{
 
     private Filer filer;
     private Messager messager;
+    private String pluginName;
 
     @Override
     public void init(ProcessingEnvironment processingEnv) {
@@ -33,12 +37,26 @@ public class GeneratePlugin extends AbstractProcessor{
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        Set<? extends Element> annotatedWithPlugin = roundEnv.getElementsAnnotatedWith(Plugin.class);
+        if (annotatedWithPlugin.size() > 1) throw new IllegalArgumentException("Multiple annotation Plugin found");
+        PluginEntity pluginEntity = new PluginEntity();
+        for (Element element : annotatedWithPlugin) {
+            Plugin plugin = element.getAnnotation(Plugin.class);
+            pluginEntity.setName(plugin.name());
+            pluginEntity.setVersion(plugin.version());
+            pluginName = pluginEntity.getName();
+        }
+
+        List<CommandGroupEntity> commandGroupEntities = new ArrayList<CommandGroupEntity>();
         Set<? extends Element> annotatedWithCommandGroup = roundEnv.getElementsAnnotatedWith(CommandGroup.class);
         for (Element commGr : annotatedWithCommandGroup) {
-            CommandGroupEntityBuilder builder = getCommandGroupEntityBuilder(commGr)
-                    .withCommands(getCommandEntities(commGr));
-            System.out.println(builder.build());
+            CommandGroupEntity commandGroupEntity = getCommandGroupEntityBuilder(commGr)
+                    .withCommands(getCommandEntities(commGr))
+                    .build();
+            commandGroupEntities.add(commandGroupEntity);
         }
+        pluginEntity.setCommandGroups(commandGroupEntities);
+        System.out.println(pluginEntity);
         return true;
     }
 
@@ -55,9 +73,10 @@ public class GeneratePlugin extends AbstractProcessor{
         List<CommandEntity> commandEntities = new ArrayList<CommandEntity>();
         for (Element elementmethod : commGr.getEnclosedElements()) {
             if (elementmethod != null && elementmethod.getAnnotation(Command.class) != null){
-                CommandEntityBuilder commandBuilder = getCommandEntityBuilder(elementmethod)
-                    .withArgEntities(getArgEntities(elementmethod));
-                commandEntities.add(commandBuilder.build());
+                CommandEntity commandBuilder = getCommandEntityBuilder(elementmethod)
+                    .withArgEntities(getArgEntities(elementmethod))
+                    .build();
+                commandEntities.add(commandBuilder);
             }
         }
         return commandEntities;
@@ -67,7 +86,7 @@ public class GeneratePlugin extends AbstractProcessor{
         System.out.println("-- Command scanned : "+ elementmethod.getSimpleName());
         Command command = elementmethod.getAnnotation(Command.class);
         return CommandEntityBuilder.aCommandEntity()
-                .withCommandValue(command.name().equals("") ? elementmethod.getSimpleName().toString().toLowerCase() : command.name())
+                .withCommandValue("".equals(command.name()) ? elementmethod.getSimpleName().toString().toLowerCase() : command.name())
                 .withFordAdmin(elementmethod.getAnnotation(Admin.class) != null)
                 .withForConsole(elementmethod.getAnnotation(Console.class) != null)
                 .withDescription(command.description())
@@ -99,10 +118,16 @@ public class GeneratePlugin extends AbstractProcessor{
     }
 
     private List<String> getPermissionsForElement(Element commGr) {
+        List<String> permissions = new ArrayList<String>();
         Permission permissionForMethod = commGr.getAnnotation(Permission.class);
+        //TODO refund this
         if(permissionForMethod != null){
-            return Arrays.asList(permissionForMethod.value());
+            if(permissionForMethod.value() == null || permissionForMethod.value().length == 0){
+                permissions = Arrays.asList(pluginName.toLowerCase() + "." + commGr.getSimpleName().toString().toLowerCase());
+            }else{
+                permissions = Arrays.asList(permissionForMethod.value());
+            }
         }
-        return new ArrayList<String>();
+        return permissions;
     }
 }

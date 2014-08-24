@@ -61,13 +61,13 @@ public class CommandEntity {
 
     @Override
     public String toString() {
-        return "CommandEntity{" +
-                "commandValue='" + commandValue + '\'' +
-                ", description='" + description + '\'' +
-                ", permissions=" + permissions +
-                ", fordAdmin=" + fordAdmin +
-                ", forConsole=" + forConsole +
-                ", argEntities=" + argEntities +
+        return "\nCommandEntity{" +
+                "\ncommandValue='" + commandValue + '\'' +
+                ",\ndescription='" + description + '\'' +
+                ",\npermissions=" + permissions +
+                ",\nfordAdmin=" + fordAdmin +
+                ",\nforConsole=" + forConsole +
+                ",\nargEntities=" + argEntities +
                 '}';
     }
 }

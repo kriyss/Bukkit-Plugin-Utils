@@ -51,12 +51,12 @@ public class CommandGroupEntity {
 
     @Override
     public String toString() {
-        return "CommandGroupEntity{" +
-                "rootCommand='" + rootCommand + '\'' +
-                ", fordAdmin=" + fordAdmin +
-                ", forConsole=" + forConsole +
-                ", permissions=" + permissions +
-                ", commands=" + commands +
+        return "\nCommandGroupEntity{" +
+                ",\nrootCommand='" + rootCommand + '\'' +
+                ",\nfordAdmin=" + fordAdmin +
+                ",\nforConsole=" + forConsole +
+                ",\npermissions=" + permissions +
+                ",\ncommands=" + commands +
                 '}';
     }
 }
