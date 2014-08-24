@@ -5,9 +5,6 @@ import org.kriyss.bukkit.utils.annotations.proc.entity.CommandEntity;
 
 import java.util.List;
 
-/**
- * Created by kriyss on 23/08/2014.
- */
 public class CommandEntityBuilder {
     private String commandValue;
     private String description;

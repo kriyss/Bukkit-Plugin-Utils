@@ -15,7 +15,6 @@ import org.kriyss.bukkit.utils.annotations.proc.entity.builder.CommandGroupEntit
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
-import javax.tools.Diagnostic;
 import java.util.*;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_7)

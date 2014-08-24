@@ -5,9 +5,6 @@ import org.kriyss.bukkit.utils.annotations.proc.entity.CommandGroupEntity;
 
 import java.util.List;
 
-/**
- * Created by kriyss on 23/08/2014.
- */
 public class CommandGroupEntityBuilder {
     private String rootCommand;
     private boolean fordAdmin = false;

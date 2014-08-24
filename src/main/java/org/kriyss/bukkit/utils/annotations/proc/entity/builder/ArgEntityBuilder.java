@@ -2,8 +2,6 @@ package org.kriyss.bukkit.utils.annotations.proc.entity.builder;
 
 import org.kriyss.bukkit.utils.annotations.proc.entity.ArgEntity;
 
-import java.lang.reflect.Type;
-
 public class ArgEntityBuilder {
     private String name;
     private int min;
