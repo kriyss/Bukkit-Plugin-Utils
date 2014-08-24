@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.PARAMETER)
 public @interface Arg {
+    String value() default "";
     int min() default Integer.MIN_VALUE;
     int max() default Integer.MAX_VALUE;
     boolean required() default true;

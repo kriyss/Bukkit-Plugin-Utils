@@ -8,6 +8,8 @@ public class CommandEntity {
     private List<String> permissions;
     private boolean fordAdmin = false;
     private boolean forConsole = false;
+    private List<ArgEntity> argEntities;
+
 
     public String getCommandValue() {
         return commandValue;
@@ -49,8 +51,23 @@ public class CommandEntity {
         this.forConsole = forConsole;
     }
 
+    public List<ArgEntity> getArgEntities() {
+        return argEntities;
+    }
+
+    public void setArgEntities(List<ArgEntity> argEntities) {
+        this.argEntities = argEntities;
+    }
+
     @Override
     public String toString() {
-        return "CommandEntity{" + "commandValue='" + commandValue + '\'' + ", description='" + description + '\'' + ", permissions=" + permissions + ", fordAdmin=" + fordAdmin + ", forConsole=" + forConsole + '}';
+        return "CommandEntity{" +
+                "commandValue='" + commandValue + '\'' +
+                ", description='" + description + '\'' +
+                ", permissions=" + permissions +
+                ", fordAdmin=" + fordAdmin +
+                ", forConsole=" + forConsole +
+                ", argEntities=" + argEntities +
+                '}';
     }
 }
