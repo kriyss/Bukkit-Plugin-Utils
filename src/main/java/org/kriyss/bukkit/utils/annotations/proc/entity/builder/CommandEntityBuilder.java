@@ -8,7 +8,8 @@ import java.util.List;
 public class CommandEntityBuilder {
     private String commandValue;
     private String description;
-    private List<String> permissions;
+    private String permission;
+    private String permissionMessage;
     private List<ArgEntity> argEntities;
     private boolean fordAdmin = false;
     private boolean forConsole = false;
@@ -30,8 +31,13 @@ public class CommandEntityBuilder {
         return this;
     }
 
-    public CommandEntityBuilder withPermissions(List<String> permissions) {
-        this.permissions = permissions;
+    public CommandEntityBuilder withPermission(String permission) {
+        this.permission = permission;
+        return this;
+    }
+
+    public CommandEntityBuilder withPermissionMessage(String permissionMessage) {
+        this.permissionMessage = permissionMessage;
         return this;
     }
 
@@ -54,7 +60,8 @@ public class CommandEntityBuilder {
         CommandEntity commandEntity = new CommandEntity();
         commandEntity.setCommandValue(commandValue);
         commandEntity.setDescription(description);
-        commandEntity.setPermissions(permissions);
+        commandEntity.setPermission(permission);
+        commandEntity.setPermissionMessage(permissionMessage);
         commandEntity.setFordAdmin(fordAdmin);
         commandEntity.setForConsole(forConsole);
         commandEntity.setArgEntities(argEntities);

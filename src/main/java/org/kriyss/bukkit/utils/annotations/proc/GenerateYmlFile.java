@@ -44,17 +44,7 @@
 //        return sb.toString();
 //    }
 //
-//    private String getCommandsInfo(RoundEnvironment roundEnv) {
-//        StringBuilder sb = new StringBuilder("commands:\n");
-//        Set<? extends Element> commands = roundEnv.getElementsAnnotatedWith(Command.class);
-//
-//        for (Element command : commands) {
-//            Command commandAnnot = command.getAnnotation(Command.class);
-//            if (commandAnnot == null) continue;
-//            sb.append(BukkitUtils.generateCommandYml(commandAnnot));
-//        }
-//        return sb.toString();
-//    }
+
 //
 //    private String getPluginInfo(Element plugin, Plugin pluginAnnot) {
 //        String pluginName = pluginAnnot.name();

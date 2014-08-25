@@ -1,11 +1,14 @@
 package org.kriyss.bukkit.utils.annotations.proc.entity;
 
+import com.google.common.base.Objects;
+
 import java.util.List;
 
 public class CommandEntity {
     private String commandValue;
     private String description;
-    private List<String> permissions;
+    private String permission;
+    private String permissionMessage;
     private boolean fordAdmin = false;
     private boolean forConsole = false;
     private List<ArgEntity> argEntities;
@@ -27,12 +30,12 @@ public class CommandEntity {
         this.description = description;
     }
 
-    public List<String> getPermissions() {
-        return permissions;
+    public String getPermission() {
+        return permission;
     }
 
-    public void setPermissions(List<String> permissions) {
-        this.permissions = permissions;
+    public void setPermission(String permission) {
+        this.permission = permission;
     }
 
     public boolean isFordAdmin() {
@@ -58,16 +61,24 @@ public class CommandEntity {
     public void setArgEntities(List<ArgEntity> argEntities) {
         this.argEntities = argEntities;
     }
+    public String getPermissionMessage() {
+        return permissionMessage;
+    }
+
+    public void setPermissionMessage(String permissionMessage) {
+        this.permissionMessage = permissionMessage;
+    }
 
     @Override
     public String toString() {
-        return "\nCommandEntity{" +
-                "\ncommandValue='" + commandValue + '\'' +
-                ",\ndescription='" + description + '\'' +
-                ",\npermissions=" + permissions +
-                ",\nfordAdmin=" + fordAdmin +
-                ",\nforConsole=" + forConsole +
-                ",\nargEntities=" + argEntities +
-                '}';
+        return Objects.toStringHelper(this)
+                .add("commandValue", commandValue)
+                .add("description", description)
+                .add("permission", permission)
+                .add("permissionMessage", permissionMessage)
+                .add("fordAdmin", fordAdmin)
+                .add("forConsole", forConsole)
+                .add("argEntities", argEntities)
+                .toString();
     }
 }

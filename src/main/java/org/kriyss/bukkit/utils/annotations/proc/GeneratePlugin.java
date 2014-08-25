@@ -11,18 +11,22 @@ import org.kriyss.bukkit.utils.annotations.permission.Permission;
 import org.kriyss.bukkit.utils.annotations.proc.entity.ArgEntity;
 import org.kriyss.bukkit.utils.annotations.proc.entity.CommandEntity;
 import org.kriyss.bukkit.utils.annotations.proc.entity.CommandGroupEntity;
+import org.kriyss.bukkit.utils.annotations.proc.entity.PluginEntity;
 import org.kriyss.bukkit.utils.annotations.proc.entity.builder.ArgEntityBuilder;
 import org.kriyss.bukkit.utils.annotations.proc.entity.builder.CommandEntityBuilder;
 import org.kriyss.bukkit.utils.annotations.proc.entity.builder.CommandGroupEntityBuilder;
 import org.kriyss.bukkit.utils.annotations.proc.entity.builder.PluginEntityBuilder;
+import org.kriyss.bukkit.utils.annotations.proc.utils.BukkitUtils;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
-import java.lang.annotation.Annotation;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+
+import static org.kriyss.bukkit.utils.annotations.proc.utils.BukkitUtils.*;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 @SupportedAnnotationTypes("org.kriyss.bukkit.utils.annotations.Plugin")
@@ -31,6 +35,7 @@ public class GeneratePlugin extends AbstractProcessor{
     private Filer filer;
     private Messager messager;
     private String pluginName;
+
 
     @Override
     public void init(ProcessingEnvironment processingEnv) {
@@ -49,9 +54,38 @@ public class GeneratePlugin extends AbstractProcessor{
                    .withVersion(plugin.version())
                    .withCompleteClassName(element.toString());
             pluginName = name;
-            break;
+            pluginBuilder.withCommandGroups(getCommandGroupEntities(roundEnv));
+            String sourceCode = generateConfigFileSource(pluginBuilder.build());
+            createNewPluginConfigFile(filer, messager, sourceCode);
         }
 
+        return true;
+    }
+    private static final String commandYML = "    {0}:\n        description: {1}\n        permission: {2}\n        usage: {3}\n        permission-message: {4}\n";
+
+    private String generateConfigFileSource(PluginEntity plug) {
+        StringBuilder sb = new StringBuilder(BukkitUtils.generateConfigFile(plug.getName(), plug.getVersion(), plug.getCompleteClassName()));
+        sb.append("commands:\n");
+        for (CommandGroupEntity groupEntity : plug.getCommandGroups()) {
+            for (CommandEntity commandEntity : groupEntity.getCommands()) {
+                StringBuilder sbArg = new StringBuilder("/"+groupEntity.getRootCommand() + commandEntity.getCommandValue() + " ");
+                String argPattern = "[{0}] ";
+                for (ArgEntity argEntity : commandEntity.getArgEntities()) {
+                    sbArg.append(MessageFormat.format(argPattern, argEntity.getName()));
+                }
+
+                sb.append(MessageFormat.format(commandYML,
+                        groupEntity.getRootCommand() + commandEntity.getCommandValue(),
+                        commandEntity.getDescription(),
+                        commandEntity.getPermission(),
+                        sbArg.toString(),
+                        commandEntity.getPermissionMessage()));
+            }
+        }
+        return sb.toString();
+    }
+
+    private List<CommandGroupEntity> getCommandGroupEntities(RoundEnvironment roundEnv) {
         List<CommandGroupEntity> commandGroupEntities = Lists.newArrayList();
         for (Element commGr : roundEnv.getElementsAnnotatedWith(CommandGroup.class)) {
             commandGroupEntities.add(
@@ -59,17 +93,7 @@ public class GeneratePlugin extends AbstractProcessor{
                         .withCommands(getCommandEntities(commGr))
                         .build());
         }
-        pluginBuilder.withCommandGroups(commandGroupEntities);
-        System.out.println(pluginBuilder.build());
-        return true;
-    }
-
-    private String getDefaultOrValue(Element element, String value) {
-        return "".equals(value) ? getElementLower(element) : value;
-    }
-
-    private String getElementLower(Element element) {
-        return element.getSimpleName().toString().toLowerCase();
+        return commandGroupEntities;
     }
 
     private CommandGroupEntityBuilder getCommandGroupEntityBuilder(Element commGr) {
@@ -98,12 +122,13 @@ public class GeneratePlugin extends AbstractProcessor{
     private CommandEntityBuilder getCommandEntityBuilder(Element commandEntity) {
         System.out.println("-- Command scanned : " + commandEntity.getSimpleName());
         Command command = commandEntity.getAnnotation(Command.class);
+        List<String> permissionsForElement = getPermissionsForElement(commandEntity);
         return CommandEntityBuilder.aCommandEntity()
-                .withCommandValue( getDefaultOrValue(commandEntity, command.name()))
-                .withFordAdmin( containsAnnotation(commandEntity, Admin.class))
-                .withForConsole( containsAnnotation(commandEntity, Console.class))
-                .withDescription( command.description())
-                .withPermissions( getPermissionsForElement(commandEntity));
+                .withCommandValue(getDefaultOrValue(commandEntity, command.name()))
+                .withFordAdmin(containsAnnotation(commandEntity, Admin.class))
+                .withForConsole(containsAnnotation(commandEntity, Console.class))
+                .withDescription(command.description())
+                .withPermission(permissionsForElement.isEmpty() ? null : permissionsForElement.get(0));
     }
 
     private List<ArgEntity> getArgEntities(Element elementmethod) {
@@ -138,15 +163,4 @@ public class GeneratePlugin extends AbstractProcessor{
         }
         return permissions;
     }
-    private <A extends Annotation> boolean containsAnnotation(Element element, Class<A> annotation){
-        return element != null && element.getAnnotation(annotation) != null;
-    }
-
-    public static String getClassName(Element element){
-        return element.getSimpleName().toString();
-    }
-    public static String getPackageName(Element element){
-        return element.toString().substring(0,element.toString().lastIndexOf("."));
-    }
-
 }
