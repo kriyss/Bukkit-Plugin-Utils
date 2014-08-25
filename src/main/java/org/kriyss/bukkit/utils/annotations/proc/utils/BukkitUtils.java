@@ -16,10 +16,6 @@ public class BukkitUtils {
 
     private BukkitUtils() {}
 
-    public static String generateConfigFile(String pluginName, String pluginVersion, String clazzpackage) {
-        return "name: " + pluginName + "\nmain: " + clazzpackage + "Launcher\nversion: " + pluginVersion + "\n";
-    }
-
     public static void createNewPluginConfigFile(Filer filer, Messager messager, String sourceCode) {
         try {
             messager.printMessage(Diagnostic.Kind.NOTE, "Generate Plugin.yml file");

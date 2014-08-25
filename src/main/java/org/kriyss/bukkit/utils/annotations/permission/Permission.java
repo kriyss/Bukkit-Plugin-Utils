@@ -8,6 +8,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 @Target({ElementType.TYPE, ElementType.METHOD})
 public @interface Permission {
-    String[] value() default "";
+    String value() default "";
     String message() default "You are not allowed to execute this command";
 }

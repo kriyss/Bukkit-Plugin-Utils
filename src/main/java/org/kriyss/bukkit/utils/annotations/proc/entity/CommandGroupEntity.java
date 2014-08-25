@@ -1,12 +1,15 @@
 package org.kriyss.bukkit.utils.annotations.proc.entity;
 
+import com.google.common.base.Objects;
+
 import java.util.List;
 
 public class CommandGroupEntity {
     private String rootCommand;
     private boolean fordAdmin = false;
     private boolean forConsole = false;
-    private List<String> permissions;
+    private String permission;
+    private String permissionMessage;
     private List<CommandEntity> commands;
     private String completeClassName;
 
@@ -34,12 +37,12 @@ public class CommandGroupEntity {
         this.forConsole = forConsole;
     }
 
-    public List<String> getPermissions() {
-        return permissions;
+    public String getPermission() {
+        return permission;
     }
 
-    public void setPermissions(List<String> permissions) {
-        this.permissions = permissions;
+    public void setPermission(String permission) {
+        this.permission = permission;
     }
 
     public List<CommandEntity> getCommands() {
@@ -58,15 +61,24 @@ public class CommandGroupEntity {
         this.completeClassName = completeClassName;
     }
 
+    public String getPermissionMessage() {
+        return permissionMessage;
+    }
+
+    public void setPermissionMessage(String permissionMessage) {
+        this.permissionMessage = permissionMessage;
+    }
+
     @Override
     public String toString() {
-        return "CommandGroupEntity{" +
-                "rootCommand='" + rootCommand + '\'' +
-                ", fordAdmin=" + fordAdmin +
-                ", forConsole=" + forConsole +
-                ", permissions=" + permissions +
-                ", commands=" + commands +
-                ", completeClassName='" + completeClassName + '\'' +
-                '}';
+        return "\n\t"+Objects.toStringHelper(this)
+                .add("\trootCommand", rootCommand)
+                .add("\tfordAdmin", fordAdmin)
+                .add("\tforConsole", forConsole)
+                .add("\tpermission", permission)
+                .add("\tpermissionMessage", permissionMessage)
+                .add("\tcompleteClassName", completeClassName)
+                .add("\tcommands", commands)
+                .toString();
     }
 }

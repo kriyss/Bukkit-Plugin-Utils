@@ -71,14 +71,14 @@ public class CommandEntity {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this)
-                .add("commandValue", commandValue)
-                .add("description", description)
-                .add("permission", permission)
-                .add("permissionMessage", permissionMessage)
-                .add("fordAdmin", fordAdmin)
-                .add("forConsole", forConsole)
-                .add("argEntities", argEntities)
+        return "\n\t\t"+Objects.toStringHelper(this)
+                .add("\tcommandValue", commandValue)
+                .add("\tdescription", description)
+                .add("\tpermission", permission)
+                .add("\tpermissionMessage", permissionMessage)
+                .add("\tfordAdmin", fordAdmin)
+                .add("\tforConsole", forConsole)
+                .add("\targEntities", argEntities)
                 .toString();
     }
 }

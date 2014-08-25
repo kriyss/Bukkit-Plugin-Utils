@@ -1,5 +1,7 @@
 package org.kriyss.bukkit.utils.annotations.proc.entity;
 
+import com.google.common.base.Objects;
+
 import java.util.List;
 
 public class PluginEntity {
@@ -39,13 +41,14 @@ public class PluginEntity {
     public void setCompleteClassName(String completeClassName) {
         this.completeClassName = completeClassName;
     }
+
     @Override
     public String toString() {
-        return "PluginEntity{" +
-                "name='" + name + '\'' +
-                ", version='" + version + '\'' +
-                ", completeClassName='" + completeClassName + '\'' +
-                ", commandGroups=" + commandGroups +
-                '}';
+        return "\n"+Objects.toStringHelper(this)
+                .add("name", name)
+                .add("version", version)
+                .add("completeClassName", completeClassName)
+                .add("commandGroups", commandGroups)
+                .toString();
     }
 }

@@ -1,5 +1,7 @@
 package org.kriyss.bukkit.utils.annotations.proc.entity;
 
+import com.google.common.base.Objects;
+
 public class ArgEntity {
     private String name;
     private boolean required;
@@ -40,11 +42,11 @@ public class ArgEntity {
 
     @Override
     public String toString() {
-        return "\nArgEntity{" +
-                "\nname='" + name + '\'' +
-                ",\nrequired=" + required +
-                ",\nmin=" + min +
-                ",\nmax=" + max +
-                '}';
+        return "\n\t\t\t"+Objects.toStringHelper(this)
+                .add("\tname", name)
+                .add("\trequired", required)
+                .add("\tmin", min)
+                .add("\tmax", max)
+                .toString();
     }
 }

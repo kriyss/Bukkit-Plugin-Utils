@@ -11,18 +11,15 @@ import org.kriyss.bukkit.utils.annotations.permission.Permission;
 import org.kriyss.bukkit.utils.annotations.proc.entity.ArgEntity;
 import org.kriyss.bukkit.utils.annotations.proc.entity.CommandEntity;
 import org.kriyss.bukkit.utils.annotations.proc.entity.CommandGroupEntity;
-import org.kriyss.bukkit.utils.annotations.proc.entity.PluginEntity;
 import org.kriyss.bukkit.utils.annotations.proc.entity.builder.ArgEntityBuilder;
 import org.kriyss.bukkit.utils.annotations.proc.entity.builder.CommandEntityBuilder;
 import org.kriyss.bukkit.utils.annotations.proc.entity.builder.CommandGroupEntityBuilder;
 import org.kriyss.bukkit.utils.annotations.proc.entity.builder.PluginEntityBuilder;
-import org.kriyss.bukkit.utils.annotations.proc.utils.BukkitUtils;
+import org.kriyss.bukkit.utils.annotations.proc.utils.PluginYMLUtils;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
-import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -35,7 +32,6 @@ public class GeneratePlugin extends AbstractProcessor{
     private Filer filer;
     private Messager messager;
     private String pluginName;
-
 
     @Override
     public void init(ProcessingEnvironment processingEnv) {
@@ -55,34 +51,12 @@ public class GeneratePlugin extends AbstractProcessor{
                    .withCompleteClassName(element.toString());
             pluginName = name;
             pluginBuilder.withCommandGroups(getCommandGroupEntities(roundEnv));
-            String sourceCode = generateConfigFileSource(pluginBuilder.build());
+            System.out.println(pluginBuilder.build());
+            String sourceCode = PluginYMLUtils.generateConfigFileSource(pluginBuilder.build());
             createNewPluginConfigFile(filer, messager, sourceCode);
         }
 
         return true;
-    }
-    private static final String commandYML = "    {0}:\n        description: {1}\n        permission: {2}\n        usage: {3}\n        permission-message: {4}\n";
-
-    private String generateConfigFileSource(PluginEntity plug) {
-        StringBuilder sb = new StringBuilder(BukkitUtils.generateConfigFile(plug.getName(), plug.getVersion(), plug.getCompleteClassName()));
-        sb.append("commands:\n");
-        for (CommandGroupEntity groupEntity : plug.getCommandGroups()) {
-            for (CommandEntity commandEntity : groupEntity.getCommands()) {
-                StringBuilder sbArg = new StringBuilder("/"+groupEntity.getRootCommand() + commandEntity.getCommandValue() + " ");
-                String argPattern = "[{0}] ";
-                for (ArgEntity argEntity : commandEntity.getArgEntities()) {
-                    sbArg.append(MessageFormat.format(argPattern, argEntity.getName()));
-                }
-
-                sb.append(MessageFormat.format(commandYML,
-                        groupEntity.getRootCommand() + commandEntity.getCommandValue(),
-                        commandEntity.getDescription(),
-                        commandEntity.getPermission(),
-                        sbArg.toString(),
-                        commandEntity.getPermissionMessage()));
-            }
-        }
-        return sb.toString();
     }
 
     private List<CommandGroupEntity> getCommandGroupEntities(RoundEnvironment roundEnv) {
@@ -98,12 +72,19 @@ public class GeneratePlugin extends AbstractProcessor{
 
     private CommandGroupEntityBuilder getCommandGroupEntityBuilder(Element commGr) {
         System.out.println("- Class scanned : "+ commGr.getSimpleName());
-        return CommandGroupEntityBuilder.aCommandGroupEntity()
+        CommandGroupEntityBuilder groupEntityBuilder = CommandGroupEntityBuilder.aCommandGroupEntity()
                 .withCompleteClassName(commGr.toString())
                 .withRootCommand(commGr.getAnnotation(CommandGroup.class).value())
                 .withFordAdmin(containsAnnotation(commGr, Admin.class))
-                .withForConsole(containsAnnotation(commGr, Console.class))
-                .withPermissions(getPermissionsForElement(commGr));
+                .withForConsole(containsAnnotation(commGr, Console.class));
+
+        Permission permission = getPermissionForElement(commGr);
+        boolean permissionIsPresent = permission != null;
+        if(permissionIsPresent){
+            groupEntityBuilder.withPermission(permission.value())
+                    .withPermissionMessage(permission.message());
+        }
+        return groupEntityBuilder;
     }
 
     private List<CommandEntity> getCommandEntities(Element commandGroupClass) {
@@ -119,16 +100,24 @@ public class GeneratePlugin extends AbstractProcessor{
         return commandEntities;
     }
 
-    private CommandEntityBuilder getCommandEntityBuilder(Element commandEntity) {
-        System.out.println("-- Command scanned : " + commandEntity.getSimpleName());
-        Command command = commandEntity.getAnnotation(Command.class);
-        List<String> permissionsForElement = getPermissionsForElement(commandEntity);
-        return CommandEntityBuilder.aCommandEntity()
-                .withCommandValue(getDefaultOrValue(commandEntity, command.name()))
-                .withFordAdmin(containsAnnotation(commandEntity, Admin.class))
-                .withForConsole(containsAnnotation(commandEntity, Console.class))
-                .withDescription(command.description())
-                .withPermission(permissionsForElement.isEmpty() ? null : permissionsForElement.get(0));
+    private CommandEntityBuilder getCommandEntityBuilder(Element methodElement) {
+        System.out.println("-- Command scanned : " + methodElement.getSimpleName());
+        Command command = methodElement.getAnnotation(Command.class);
+
+        CommandEntityBuilder commandEntityBuilder = CommandEntityBuilder.aCommandEntity()
+                .withCommandValue(getDefaultOrValue(methodElement, command.name()))
+                .withFordAdmin(containsAnnotation(methodElement, Admin.class))
+                .withForConsole(containsAnnotation(methodElement, Console.class))
+                .withDescription(command.description());
+
+        Permission permission = getPermissionForElement(methodElement);
+        boolean permissionIsPresent = permission != null;
+        if(permissionIsPresent){
+            commandEntityBuilder.withPermission(permission.value())
+                                .withPermissionMessage(permission.message());
+        }
+
+        return commandEntityBuilder;
     }
 
     private List<ArgEntity> getArgEntities(Element elementmethod) {
@@ -150,17 +139,11 @@ public class GeneratePlugin extends AbstractProcessor{
         return argEntities;
     }
 
-    private List<String> getPermissionsForElement(Element commGr) {
-        List<String> permissions = Lists.newArrayList();
+    private Permission getPermissionForElement(Element commGr) {
         Permission permissionForMethod = commGr.getAnnotation(Permission.class);
-        //TODO refund this
-        if(containsAnnotation(commGr, Permission.class)){
-            if(permissionForMethod.value() != null && permissionForMethod.value().length < 0){
-                permissions = Arrays.asList(pluginName.toLowerCase() + "." + getElementLower(commGr));
-            }else{
-                permissions = Arrays.asList(permissionForMethod.value());
-            }
+        if(containsAnnotation(commGr, Permission.class)) {
+            return permissionForMethod;
         }
-        return permissions;
+        return null;
     }
 }

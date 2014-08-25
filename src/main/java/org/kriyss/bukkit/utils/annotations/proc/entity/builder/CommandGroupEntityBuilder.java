@@ -9,7 +9,8 @@ public class CommandGroupEntityBuilder {
     private String rootCommand;
     private boolean fordAdmin = false;
     private boolean forConsole = false;
-    private List<String> permissions;
+    private String permission;
+    private String permissionMessage;
     private List<CommandEntity> commands;
     private String completeClassName;
 
@@ -40,8 +41,13 @@ public class CommandGroupEntityBuilder {
         return this;
     }
 
-    public CommandGroupEntityBuilder withPermissions(List<String> permissions) {
-        this.permissions = permissions;
+    public CommandGroupEntityBuilder withPermission(String permission) {
+        this.permission = permission;
+        return this;
+    }
+
+    public CommandGroupEntityBuilder withPermissionMessage(String permissionMessage) {
+        this.permissionMessage = permissionMessage;
         return this;
     }
 
@@ -55,7 +61,8 @@ public class CommandGroupEntityBuilder {
         commandGroupEntity.setRootCommand(rootCommand);
         commandGroupEntity.setFordAdmin(fordAdmin);
         commandGroupEntity.setForConsole(forConsole);
-        commandGroupEntity.setPermissions(permissions);
+        commandGroupEntity.setPermission(permission);
+        commandGroupEntity.setPermissionMessage(permissionMessage);
         commandGroupEntity.setCommands(commands);
         commandGroupEntity.setCompleteClassName(completeClassName);
         return commandGroupEntity;
