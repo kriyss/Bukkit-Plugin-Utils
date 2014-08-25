@@ -1,0 +1,49 @@
+package org.kriyss.bukkit.utils.annotations.proc.entity.builder;
+
+import org.kriyss.bukkit.utils.annotations.proc.entity.CommandGroupEntity;
+import org.kriyss.bukkit.utils.annotations.proc.entity.PluginEntity;
+
+import java.util.List;
+
+public class PluginEntityBuilder {
+    private String name;
+    private String version;
+    private String completeClassName;
+    private List<CommandGroupEntity> commandGroups;
+
+    private PluginEntityBuilder() {
+    }
+
+    public static PluginEntityBuilder aPluginEntity() {
+        return new PluginEntityBuilder();
+    }
+
+    public PluginEntityBuilder withName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public PluginEntityBuilder withVersion(String version) {
+        this.version = version;
+        return this;
+    }
+
+    public PluginEntityBuilder withCompleteClassName(String completeClassName) {
+        this.completeClassName = completeClassName;
+        return this;
+    }
+
+    public PluginEntityBuilder withCommandGroups(List<CommandGroupEntity> commandGroups) {
+        this.commandGroups = commandGroups;
+        return this;
+    }
+
+    public PluginEntity build() {
+        PluginEntity pluginEntity = new PluginEntity();
+        pluginEntity.setName(name);
+        pluginEntity.setVersion(version);
+        pluginEntity.setCompleteClassName(completeClassName);
+        pluginEntity.setCommandGroups(commandGroups);
+        return pluginEntity;
+    }
+}

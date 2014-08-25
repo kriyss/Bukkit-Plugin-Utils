@@ -1,5 +1,6 @@
 package org.kriyss.bukkit.utils.annotations.proc;
 
+import com.google.common.collect.Lists;
 import org.kriyss.bukkit.utils.annotations.Plugin;
 import org.kriyss.bukkit.utils.annotations.command.Arg;
 import org.kriyss.bukkit.utils.annotations.command.Command;
@@ -10,16 +11,18 @@ import org.kriyss.bukkit.utils.annotations.permission.Permission;
 import org.kriyss.bukkit.utils.annotations.proc.entity.ArgEntity;
 import org.kriyss.bukkit.utils.annotations.proc.entity.CommandEntity;
 import org.kriyss.bukkit.utils.annotations.proc.entity.CommandGroupEntity;
-import org.kriyss.bukkit.utils.annotations.proc.entity.PluginEntity;
 import org.kriyss.bukkit.utils.annotations.proc.entity.builder.ArgEntityBuilder;
 import org.kriyss.bukkit.utils.annotations.proc.entity.builder.CommandEntityBuilder;
 import org.kriyss.bukkit.utils.annotations.proc.entity.builder.CommandGroupEntityBuilder;
+import org.kriyss.bukkit.utils.annotations.proc.entity.builder.PluginEntityBuilder;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
 import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 @SupportedAnnotationTypes("org.kriyss.bukkit.utils.annotations.Plugin")
@@ -38,27 +41,26 @@ public class GeneratePlugin extends AbstractProcessor{
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        Set<? extends Element> annotatedWithPlugin = roundEnv.getElementsAnnotatedWith(Plugin.class);
-        if (annotatedWithPlugin.size() > 1) throw new IllegalArgumentException("Multiple annotation Plugin found");
-        PluginEntity pluginEntity = new PluginEntity();
-        for (Element element : annotatedWithPlugin) {
+        PluginEntityBuilder pluginBuilder = PluginEntityBuilder.aPluginEntity();
+        for (Element element : roundEnv.getElementsAnnotatedWith(Plugin.class)) {
             Plugin plugin = element.getAnnotation(Plugin.class);
-            pluginEntity.setName(getDefaultOrValue(element, plugin.name()));
-            pluginEntity.setVersion(plugin.version());
-            pluginEntity.setCompleteClassName(element.toString());
-            pluginName = pluginEntity.getName();
+            String name = getDefaultOrValue(element, plugin.name());
+            pluginBuilder.withName(name)
+                   .withVersion(plugin.version())
+                   .withCompleteClassName(element.toString());
+            pluginName = name;
+            break;
         }
 
-        List<CommandGroupEntity> commandGroupEntities = new ArrayList<CommandGroupEntity>();
-        Set<? extends Element> annotatedWithCommandGroup = roundEnv.getElementsAnnotatedWith(CommandGroup.class);
-        for (Element commGr : annotatedWithCommandGroup) {
-            CommandGroupEntity commandGroupEntity = getCommandGroupEntityBuilder(commGr)
-                    .withCommands(getCommandEntities(commGr))
-                    .build();
-            commandGroupEntities.add(commandGroupEntity);
+        List<CommandGroupEntity> commandGroupEntities = Lists.newArrayList();
+        for (Element commGr : roundEnv.getElementsAnnotatedWith(CommandGroup.class)) {
+            commandGroupEntities.add(
+                    getCommandGroupEntityBuilder(commGr)
+                        .withCommands(getCommandEntities(commGr))
+                        .build());
         }
-        pluginEntity.setCommandGroups(commandGroupEntities);
-        System.out.println(pluginEntity);
+        pluginBuilder.withCommandGroups(commandGroupEntities);
+        System.out.println(pluginBuilder.build());
         return true;
     }
 
@@ -75,19 +77,19 @@ public class GeneratePlugin extends AbstractProcessor{
         return CommandGroupEntityBuilder.aCommandGroupEntity()
                 .withCompleteClassName(commGr.toString())
                 .withRootCommand(commGr.getAnnotation(CommandGroup.class).value())
-                .withFordAdmin(commGr.getAnnotation(Admin.class) != null)
-                .withForConsole(commGr.getAnnotation(Console.class) != null)
+                .withFordAdmin(containsAnnotation(commGr, Admin.class))
+                .withForConsole(containsAnnotation(commGr, Console.class))
                 .withPermissions(getPermissionsForElement(commGr));
     }
 
     private List<CommandEntity> getCommandEntities(Element commandGroupClass) {
-        List<CommandEntity> commandEntities = new ArrayList<CommandEntity>();
+        List<CommandEntity> commandEntities = Lists.newArrayList();
         for (Element method : commandGroupClass.getEnclosedElements()) {
             if (containsAnnotation(method, Command.class)){
-                CommandEntity commandEntity = getCommandEntityBuilder(method)
-                    .withArgEntities(getArgEntities(method))
-                    .build();
-                commandEntities.add(commandEntity);
+                commandEntities.add(
+                        getCommandEntityBuilder(method)
+                            .withArgEntities(getArgEntities(method))
+                            .build());
             }
         }
         return commandEntities;
@@ -105,23 +107,18 @@ public class GeneratePlugin extends AbstractProcessor{
     }
 
     private List<ArgEntity> getArgEntities(Element elementmethod) {
-        List<ArgEntity> argEntities = new ArrayList<ArgEntity>();
-
+        List<ArgEntity> argEntities = Lists.newArrayList();
         if(elementmethod.getKind() == ElementKind.METHOD) {
-            ExecutableElement methodElement = (ExecutableElement) elementmethod;
-            List<? extends VariableElement> parameters = methodElement.getParameters();
-            for (VariableElement parameter : parameters) {
+            for (VariableElement parameter : ((ExecutableElement) elementmethod).getParameters()) {
                 Arg arg = parameter.getAnnotation(Arg.class);
                 if (arg != null){
-                    ArgEntity argEntity = ArgEntityBuilder.anArgEntity()
-                            .withName(getDefaultOrValue(parameter, arg.value()))
-                            .withMax(arg.max())
-                            .withMin(arg.min())
-                            .withIsRequired(arg.required())
-                            .build();
-                    System.out.println("--- Param scanned : "+ argEntity);
-
-                    argEntities.add(argEntity);
+                    argEntities.add(
+                            ArgEntityBuilder.anArgEntity()
+                                .withName(getDefaultOrValue(parameter, arg.value()))
+                                .withMax(arg.max())
+                                .withMin(arg.min())
+                                .withIsRequired(arg.required())
+                                .build());
                 }
             }
         }
@@ -129,7 +126,7 @@ public class GeneratePlugin extends AbstractProcessor{
     }
 
     private List<String> getPermissionsForElement(Element commGr) {
-        List<String> permissions = new ArrayList<String>();
+        List<String> permissions = Lists.newArrayList();
         Permission permissionForMethod = commGr.getAnnotation(Permission.class);
         //TODO refund this
         if(containsAnnotation(commGr, Permission.class)){
