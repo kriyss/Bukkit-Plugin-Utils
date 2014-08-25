@@ -30,7 +30,7 @@ He is also inspired by ToHPluginUtils - ZerothAngel's Bukkit plugin library.
    @CommandGroup("rubis")
    public class RubisCommand {
    
-       private static final IMoneyCore moneyCore = MoneyCore.getInstance();
+       @Inject private static final IMoneyCore moneyCore;
    
        @Permission("neomod.perm.other")
        @Command(description = "give money to another player")
