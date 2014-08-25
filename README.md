@@ -44,9 +44,19 @@ He is also inspired by ToHPluginUtils - ZerothAngel's Bukkit plugin library.
            ...
            return true;
        }
+       
+       @Permission(message="You can't do that little chicken")
+       @Command(name = "holdup", description = "take money to another player", )
+       public boolean other(CommandSender sender, @Arg String player, @Arg(min = 0) int amount){
+           ...
+           return true;
+       }
    }
 ```
 
 This exemple will generate : 
 *   commands `rubisgive` with permission `neomod.perm.other` for Admin and Console too.
+*   commands `rubistake` with permission `neomod.rubis.take` for Admin and Console too.
+*   commands `rubisholdup` with permission `neomod.rubis.holdup` for Admin and Console too. With personnal error message and name.
 *   plugin.yml with automaticaly usage/name/desciption/permission field.
+*   Automatical check before call method like permissions/ isAdmin/ isConsole/ length and id field are present.
