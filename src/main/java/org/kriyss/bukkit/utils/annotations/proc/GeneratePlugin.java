@@ -18,6 +18,7 @@ import org.kriyss.bukkit.utils.annotations.proc.entity.builder.CommandGroupEntit
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
+import java.lang.annotation.Annotation;
 import java.util.*;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
@@ -42,7 +43,7 @@ public class GeneratePlugin extends AbstractProcessor{
         PluginEntity pluginEntity = new PluginEntity();
         for (Element element : annotatedWithPlugin) {
             Plugin plugin = element.getAnnotation(Plugin.class);
-            pluginEntity.setName(plugin.name());
+            pluginEntity.setName(getDefaultOrValue(element, plugin.name()));
             pluginEntity.setVersion(plugin.version());
             pluginEntity.setCompleteClassName(element.toString());
             pluginName = pluginEntity.getName();
@@ -61,6 +62,14 @@ public class GeneratePlugin extends AbstractProcessor{
         return true;
     }
 
+    private String getDefaultOrValue(Element element, String value) {
+        return "".equals(value) ? getElementLower(element) : value;
+    }
+
+    private String getElementLower(Element element) {
+        return element.getSimpleName().toString().toLowerCase();
+    }
+
     private CommandGroupEntityBuilder getCommandGroupEntityBuilder(Element commGr) {
         System.out.println("- Class scanned : "+ commGr.getSimpleName());
         return CommandGroupEntityBuilder.aCommandGroupEntity()
@@ -71,28 +80,28 @@ public class GeneratePlugin extends AbstractProcessor{
                 .withPermissions(getPermissionsForElement(commGr));
     }
 
-    private List<CommandEntity> getCommandEntities(Element commGr) {
+    private List<CommandEntity> getCommandEntities(Element commandGroupClass) {
         List<CommandEntity> commandEntities = new ArrayList<CommandEntity>();
-        for (Element elementmethod : commGr.getEnclosedElements()) {
-            if (elementmethod != null && elementmethod.getAnnotation(Command.class) != null){
-                CommandEntity commandBuilder = getCommandEntityBuilder(elementmethod)
-                    .withArgEntities(getArgEntities(elementmethod))
+        for (Element method : commandGroupClass.getEnclosedElements()) {
+            if (containsAnnotation(method, Command.class)){
+                CommandEntity commandEntity = getCommandEntityBuilder(method)
+                    .withArgEntities(getArgEntities(method))
                     .build();
-                commandEntities.add(commandBuilder);
+                commandEntities.add(commandEntity);
             }
         }
         return commandEntities;
     }
 
-    private CommandEntityBuilder getCommandEntityBuilder(Element elementmethod) {
-        System.out.println("-- Command scanned : "+ elementmethod.getSimpleName());
-        Command command = elementmethod.getAnnotation(Command.class);
+    private CommandEntityBuilder getCommandEntityBuilder(Element commandEntity) {
+        System.out.println("-- Command scanned : " + commandEntity.getSimpleName());
+        Command command = commandEntity.getAnnotation(Command.class);
         return CommandEntityBuilder.aCommandEntity()
-                .withCommandValue("".equals(command.name()) ? elementmethod.getSimpleName().toString().toLowerCase() : command.name())
-                .withFordAdmin(elementmethod.getAnnotation(Admin.class) != null)
-                .withForConsole(elementmethod.getAnnotation(Console.class) != null)
-                .withDescription(command.description())
-                .withPermissions(getPermissionsForElement(elementmethod));
+                .withCommandValue( getDefaultOrValue(commandEntity, command.name()))
+                .withFordAdmin( containsAnnotation(commandEntity, Admin.class))
+                .withForConsole( containsAnnotation(commandEntity, Console.class))
+                .withDescription( command.description())
+                .withPermissions( getPermissionsForElement(commandEntity));
     }
 
     private List<ArgEntity> getArgEntities(Element elementmethod) {
@@ -105,7 +114,7 @@ public class GeneratePlugin extends AbstractProcessor{
                 Arg arg = parameter.getAnnotation(Arg.class);
                 if (arg != null){
                     ArgEntity argEntity = ArgEntityBuilder.anArgEntity()
-                            .withName("".equals(arg.value()) ? parameter.getSimpleName().toString().toLowerCase() : arg.value())
+                            .withName(getDefaultOrValue(parameter, arg.value()))
                             .withMax(arg.max())
                             .withMin(arg.min())
                             .withIsRequired(arg.required())
@@ -123,14 +132,17 @@ public class GeneratePlugin extends AbstractProcessor{
         List<String> permissions = new ArrayList<String>();
         Permission permissionForMethod = commGr.getAnnotation(Permission.class);
         //TODO refund this
-        if(permissionForMethod != null){
-            if(permissionForMethod.value() == null || permissionForMethod.value().length == 0){
-                permissions = Arrays.asList(pluginName.toLowerCase() + "." + commGr.getSimpleName().toString().toLowerCase());
+        if(containsAnnotation(commGr, Permission.class)){
+            if(permissionForMethod.value() != null && permissionForMethod.value().length < 0){
+                permissions = Arrays.asList(pluginName.toLowerCase() + "." + getElementLower(commGr));
             }else{
                 permissions = Arrays.asList(permissionForMethod.value());
             }
         }
         return permissions;
+    }
+    private <A extends Annotation> boolean containsAnnotation(Element element, Class<A> annotation){
+        return element != null && element.getAnnotation(annotation) != null;
     }
 
     public static String getClassName(Element element){
@@ -139,4 +151,5 @@ public class GeneratePlugin extends AbstractProcessor{
     public static String getPackageName(Element element){
         return element.toString().substring(0,element.toString().lastIndexOf("."));
     }
+
 }
