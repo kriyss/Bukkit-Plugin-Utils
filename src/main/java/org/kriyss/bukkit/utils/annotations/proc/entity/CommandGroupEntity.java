@@ -8,6 +8,7 @@ public class CommandGroupEntity {
     private boolean forConsole = false;
     private List<String> permissions;
     private List<CommandEntity> commands;
+    private String completeClassName;
 
     public String getRootCommand() {
         return rootCommand;
@@ -49,14 +50,23 @@ public class CommandGroupEntity {
         this.commands = commands;
     }
 
+    public String getCompleteClassName() {
+        return completeClassName;
+    }
+
+    public void setCompleteClassName(String completeClassName) {
+        this.completeClassName = completeClassName;
+    }
+
     @Override
     public String toString() {
-        return "\nCommandGroupEntity{" +
-                ",\nrootCommand='" + rootCommand + '\'' +
-                ",\nfordAdmin=" + fordAdmin +
-                ",\nforConsole=" + forConsole +
-                ",\npermissions=" + permissions +
-                ",\ncommands=" + commands +
+        return "CommandGroupEntity{" +
+                "rootCommand='" + rootCommand + '\'' +
+                ", fordAdmin=" + fordAdmin +
+                ", forConsole=" + forConsole +
+                ", permissions=" + permissions +
+                ", commands=" + commands +
+                ", completeClassName='" + completeClassName + '\'' +
                 '}';
     }
 }

@@ -11,6 +11,7 @@ public class CommandGroupEntityBuilder {
     private boolean forConsole = false;
     private List<String> permissions;
     private List<CommandEntity> commands;
+    private String completeClassName;
 
     private CommandGroupEntityBuilder() {
     }
@@ -44,6 +45,11 @@ public class CommandGroupEntityBuilder {
         return this;
     }
 
+    public CommandGroupEntityBuilder withCompleteClassName(String completeClassName) {
+        this.completeClassName = completeClassName;
+        return this;
+    }
+
     public CommandGroupEntity build() {
         CommandGroupEntity commandGroupEntity = new CommandGroupEntity();
         commandGroupEntity.setRootCommand(rootCommand);
@@ -51,6 +57,7 @@ public class CommandGroupEntityBuilder {
         commandGroupEntity.setForConsole(forConsole);
         commandGroupEntity.setPermissions(permissions);
         commandGroupEntity.setCommands(commands);
+        commandGroupEntity.setCompleteClassName(completeClassName);
         return commandGroupEntity;
     }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 public class PluginEntity {
     private String name;
     private String version;
+    private String completeClassName;
     private List<CommandGroupEntity> commandGroups;
 
     public String getName() {
@@ -31,12 +32,20 @@ public class PluginEntity {
         this.commandGroups = commandGroups;
     }
 
+    public String getCompleteClassName() {
+        return completeClassName;
+    }
+
+    public void setCompleteClassName(String completeClassName) {
+        this.completeClassName = completeClassName;
+    }
     @Override
     public String toString() {
-        return "\nPluginEntity{" +
-                "\nname='" + name + '\'' +
-                ",\nversion='" + version + '\'' +
-                ",\ncommandGroups=" + commandGroups +
+        return "PluginEntity{" +
+                "name='" + name + '\'' +
+                ", version='" + version + '\'' +
+                ", completeClassName='" + completeClassName + '\'' +
+                ", commandGroups=" + commandGroups +
                 '}';
     }
 }

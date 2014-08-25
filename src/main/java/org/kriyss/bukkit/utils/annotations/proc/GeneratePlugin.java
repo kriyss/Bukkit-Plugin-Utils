@@ -44,6 +44,7 @@ public class GeneratePlugin extends AbstractProcessor{
             Plugin plugin = element.getAnnotation(Plugin.class);
             pluginEntity.setName(plugin.name());
             pluginEntity.setVersion(plugin.version());
+            pluginEntity.setCompleteClassName(element.toString());
             pluginName = pluginEntity.getName();
         }
 
@@ -63,6 +64,7 @@ public class GeneratePlugin extends AbstractProcessor{
     private CommandGroupEntityBuilder getCommandGroupEntityBuilder(Element commGr) {
         System.out.println("- Class scanned : "+ commGr.getSimpleName());
         return CommandGroupEntityBuilder.aCommandGroupEntity()
+                .withCompleteClassName(commGr.toString())
                 .withRootCommand(commGr.getAnnotation(CommandGroup.class).value())
                 .withFordAdmin(commGr.getAnnotation(Admin.class) != null)
                 .withForConsole(commGr.getAnnotation(Console.class) != null)
@@ -129,5 +131,12 @@ public class GeneratePlugin extends AbstractProcessor{
             }
         }
         return permissions;
+    }
+
+    public static String getClassName(Element element){
+        return element.getSimpleName().toString();
+    }
+    public static String getPackageName(Element element){
+        return element.toString().substring(0,element.toString().lastIndexOf("."));
     }
 }
