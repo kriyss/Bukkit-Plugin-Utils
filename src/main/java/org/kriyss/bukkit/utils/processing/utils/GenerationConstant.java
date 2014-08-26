@@ -1,4 +1,4 @@
-package org.kriyss.bukkit.utils.annotations.proc.utils;
+package org.kriyss.bukkit.utils.processing.utils;
 
 public interface GenerationConstant {
 

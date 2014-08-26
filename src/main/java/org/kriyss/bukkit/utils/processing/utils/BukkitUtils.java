@@ -1,4 +1,4 @@
-package org.kriyss.bukkit.utils.annotations.proc.utils;
+package org.kriyss.bukkit.utils.processing.utils;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;

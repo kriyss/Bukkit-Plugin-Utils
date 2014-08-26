@@ -1,6 +1,6 @@
-package org.kriyss.bukkit.utils.annotations.proc.entity.builder;
+package org.kriyss.bukkit.utils.entity.builder;
 
-import org.kriyss.bukkit.utils.annotations.proc.entity.ParamEntity;
+import org.kriyss.bukkit.utils.entity.ParamEntity;
 
 public class ParamEntityBuilder {
     private String name;

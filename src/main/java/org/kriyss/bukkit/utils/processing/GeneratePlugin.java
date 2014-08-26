@@ -1,4 +1,4 @@
-package org.kriyss.bukkit.utils.annotations.proc;
+package org.kriyss.bukkit.utils.processing;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
@@ -9,19 +9,18 @@ import org.kriyss.bukkit.utils.annotations.command.Param;
 import org.kriyss.bukkit.utils.annotations.permission.Admin;
 import org.kriyss.bukkit.utils.annotations.permission.Console;
 import org.kriyss.bukkit.utils.annotations.permission.Permission;
-import org.kriyss.bukkit.utils.annotations.proc.entity.CommandEntity;
-import org.kriyss.bukkit.utils.annotations.proc.entity.CommandGroupEntity;
-import org.kriyss.bukkit.utils.annotations.proc.entity.ParamEntity;
-import org.kriyss.bukkit.utils.annotations.proc.entity.builder.*;
+import org.kriyss.bukkit.utils.entity.builder.*;
+import org.kriyss.bukkit.utils.entity.CommandEntity;
+import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
+import org.kriyss.bukkit.utils.entity.ParamEntity;
+import org.kriyss.bukkit.utils.processing.utils.BukkitUtils;
+import org.kriyss.bukkit.utils.processing.utils.PluginYMLUtils;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
 import java.util.List;
 import java.util.Set;
-
-import static org.kriyss.bukkit.utils.annotations.proc.utils.BukkitUtils.*;
-import static org.kriyss.bukkit.utils.annotations.proc.utils.PluginYMLUtils.generateConfigFileSource;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 @SupportedAnnotationTypes("org.kriyss.bukkit.utils.annotations.Plugin")
@@ -45,13 +44,13 @@ public class GeneratePlugin extends AbstractProcessor{
 
             // Retrieve information for generate plugin
             PluginEntityBuilder pluginBuilder = PluginEntityBuilder.aPluginEntity()
-                    .withName(getDefaultOrValue(element, plugin.name()))
+                    .withName(BukkitUtils.getDefaultOrValue(element, plugin.name()))
                     .withVersion(plugin.version())
                     .withCompleteClassName(element.toString())
                     .withCommandGroups(getCommandGroupEntities(roundEnv));
 
             // Creation of file 'plugin.yml'
-            createNewPluginConfigFile(filer, messager, generateConfigFileSource(pluginBuilder.build()));
+            BukkitUtils.createNewPluginConfigFile(filer, messager, PluginYMLUtils.generateConfigFileSource(pluginBuilder.build()));
         }
         return true;
     }
@@ -69,8 +68,8 @@ public class GeneratePlugin extends AbstractProcessor{
         CommandGroupEntityBuilder builder = CommandGroupEntityBuilder.aCommandGroupEntity()
                 .withCompleteClassName(commGr.toString())
                 .withRootCommand(commGr.getAnnotation(CommandGroup.class).value())
-                .withFordAdmin(containsAnnotation(commGr, Admin.class))
-                .withForConsole(containsAnnotation(commGr, Console.class))
+                .withFordAdmin(BukkitUtils.containsAnnotation(commGr, Admin.class))
+                .withForConsole(BukkitUtils.containsAnnotation(commGr, Console.class))
                 .withCommands(getCommandEntities(commGr));
         return populatePermission(commGr, builder).build();
     }
@@ -78,7 +77,7 @@ public class GeneratePlugin extends AbstractProcessor{
     private List<CommandEntity> getCommandEntities(Element commandGroupClass) {
         List<CommandEntity> commandEntities = Lists.newArrayList();
         for (Element method : commandGroupClass.getEnclosedElements()) {
-            if (containsAnnotation(method, Command.class)){
+            if (BukkitUtils.containsAnnotation(method, Command.class)){
                 commandEntities.add(populateCommand(method));
             }
         }
@@ -100,7 +99,7 @@ public class GeneratePlugin extends AbstractProcessor{
 
     private ParamEntity populateParam(VariableElement parameter, Param param) {
         return ParamEntityBuilder.anParamEntity()
-                .withName(getDefaultOrValue(parameter, param.value()))
+                .withName(BukkitUtils.getDefaultOrValue(parameter, param.value()))
                 .withMax(param.max())
                 .withMin(param.min())
                 .withIsRequired(param.required())
@@ -112,9 +111,9 @@ public class GeneratePlugin extends AbstractProcessor{
         Command command = methodElement.getAnnotation(Command.class);
 
         CommandEntityBuilder commandEntityBuilder = CommandEntityBuilder.aCommandEntity()
-                .withCommandValue(getDefaultOrValue(methodElement, command.name()))
-                .withFordAdmin(containsAnnotation(methodElement, Admin.class))
-                .withForConsole(containsAnnotation(methodElement, Console.class))
+                .withCommandValue(BukkitUtils.getDefaultOrValue(methodElement, command.name()))
+                .withFordAdmin(BukkitUtils.containsAnnotation(methodElement, Admin.class))
+                .withForConsole(BukkitUtils.containsAnnotation(methodElement, Console.class))
                 .withDescription(command.description())
                 .withParamEntities(getParamEntities(methodElement));
 
@@ -124,7 +123,7 @@ public class GeneratePlugin extends AbstractProcessor{
     private <T extends HasPermission> T populatePermission(Element element, T hasPermission) {
         Permission permission = element.getAnnotation(Permission.class);
         if(permission != null){
-            String permissionValue = StringUtils.isNotBlank(permission.value()) ? permission.value() : getElementLower(element);
+            String permissionValue = StringUtils.isNotBlank(permission.value()) ? permission.value() : BukkitUtils.getElementLower(element);
             hasPermission.withPermission(permissionValue);
             hasPermission.withPermissionMessage(permission.message());
         }

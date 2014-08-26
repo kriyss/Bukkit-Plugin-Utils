@@ -1,4 +1,4 @@
-package org.kriyss.bukkit.utils.annotations.proc.entity.builder;
+package org.kriyss.bukkit.utils.entity.builder;
 
 public interface HasPermission<T> {
     T withPermission(String permission);

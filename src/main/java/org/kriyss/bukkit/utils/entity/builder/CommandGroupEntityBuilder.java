@@ -1,7 +1,7 @@
-package org.kriyss.bukkit.utils.annotations.proc.entity.builder;
+package org.kriyss.bukkit.utils.entity.builder;
 
-import org.kriyss.bukkit.utils.annotations.proc.entity.CommandEntity;
-import org.kriyss.bukkit.utils.annotations.proc.entity.CommandGroupEntity;
+import org.kriyss.bukkit.utils.entity.CommandEntity;
+import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
 
 import java.util.List;
 

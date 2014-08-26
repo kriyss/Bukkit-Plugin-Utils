@@ -1,23 +1,23 @@
-package org.kriyss.bukkit.utils.annotations.proc.utils;
+package org.kriyss.bukkit.utils.processing.utils;
 
 import org.apache.commons.lang.StringUtils;
-import org.kriyss.bukkit.utils.annotations.proc.entity.ParamEntity;
-import org.kriyss.bukkit.utils.annotations.proc.entity.CommandEntity;
-import org.kriyss.bukkit.utils.annotations.proc.entity.CommandGroupEntity;
-import org.kriyss.bukkit.utils.annotations.proc.entity.PluginEntity;
+import org.kriyss.bukkit.utils.entity.ParamEntity;
+import org.kriyss.bukkit.utils.entity.CommandEntity;
+import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
+import org.kriyss.bukkit.utils.entity.PluginEntity;
 
 import static java.text.MessageFormat.format;
 
 public class PluginYMLUtils {
 
     private PluginYMLUtils() {
-        // YOUUU SHAAALLLL INSTANNCCIIIAAAATTTEEE MMEEEEEEE!!!!
+        // YOUUU SHAAALLLL NOOOOOTTTTT INSTANNCCIIIAAAATTTEEE MMEEEEEEE!!!!
     }
 
     private static final String TAB                             = "    ";
     private static final String YML_HEADER                      = "name: {0}\nmain: {1}\nversion: {2}\n";
     private static final String COMMAND_YML_HEADER              = "commands: \n";
-    private static final String COMMAND_YML                     = TAB + "{0}:\n";
+    private static final String COMMAND_YML_NAME = TAB + "{0}:\n";
     private static final String COMMAND_YML_DESCRIPTION         = TAB + TAB + "description: {0}\n";
     private static final String COMMAND_YML_USAGE               = TAB + TAB + "usage: {0}\n";
     private static final String COMMAND_YML_PERMISSION          = TAB + TAB + "permission: {0}\n";
@@ -29,29 +29,31 @@ public class PluginYMLUtils {
     private static final String ARG_FIELD_PATTERN_OPTIONNAL     = "[{0}(optionnal)] ";
 
     public static String generateConfigFileSource(PluginEntity plug) {
-        String ymlHeader = format(YML_HEADER, plug.getName(), plug.getCompleteClassName(), plug.getVersion());
-        StringBuilder ymlFileBuilder = new StringBuilder(ymlHeader).append(COMMAND_YML_HEADER);
+        StringBuilder ymlFileBuilder =
+                new StringBuilder(format(YML_HEADER, plug.getName(), plug.getCompleteClassName(), plug.getVersion()))
+                                .append(COMMAND_YML_HEADER);
 
         for (CommandGroupEntity groupEntity : plug.getCommandGroups()) {
             for (CommandEntity commandEntity : groupEntity.getCommands()) {
-                ymlFileBuilder = getCommandYmlPart(ymlFileBuilder, groupEntity, commandEntity, plug.getName());
+                ymlFileBuilder.append(getCommandYmlPart(groupEntity, commandEntity, plug.getName()));
             }
         }
         return ymlFileBuilder.toString();
     }
 
-    private static StringBuilder getCommandYmlPart(StringBuilder sb, CommandGroupEntity group, CommandEntity command, String pluginName) {
+    private static String getCommandYmlPart(CommandGroupEntity group, CommandEntity command, String pluginName) {
         // This part are always valued
-        sb.append(format(COMMAND_YML, group.getRootCommand() + command.getCommandValue()));
+        StringBuilder sb = new StringBuilder(format(COMMAND_YML_NAME, group.getRootCommand() + command.getCommandValue()));
         sb.append(format(COMMAND_YML_DESCRIPTION, command.getDescription()));
         sb.append(format(COMMAND_YML_USAGE, getUsage(group, command)));
+
         // Permission may be optionnal
         String permission = concatIfNotNull(".", pluginName, group.getPermission(), command.getPermission());
         if (StringUtils.isNotBlank(permission)) {
             sb.append(format(COMMAND_YML_PERMISSION, permission));
             sb.append(format(COMMAND_YML_PERMISSION_MESSAGE, getPermissionMessageOrDefault("You can't do that", command.getPermissionMessage(), group.getPermissionMessage())));
         }
-        return sb;
+        return sb.toString();
     }
 
     private static String getUsage(CommandGroupEntity groupEntity, CommandEntity commandEntity) {
@@ -70,12 +72,10 @@ public class PluginYMLUtils {
         return sb.substring(0, sb.lastIndexOf(separator));
     }
 
-    private static String getPermissionMessageOrDefault(String defaultMessage, String... permissionMessage){
-        for (String s : permissionMessage) {
+    private static String getPermissionMessageOrDefault(String defaultMessage, String... permissionMessages){
+        for (String s : permissionMessages) {
             if(StringUtils.isNotBlank(s)) return s;
         }
         return defaultMessage;
-
-
     }
 }

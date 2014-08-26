@@ -1,4 +1,4 @@
-package org.kriyss.bukkit.utils.annotations.proc.entity;
+package org.kriyss.bukkit.utils.entity;
 
 import com.google.common.base.Objects;
 
