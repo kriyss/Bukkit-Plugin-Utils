@@ -6,16 +6,13 @@ The framework create automaticaly the plugin.yml, permissions.yml etc...
 
 He is also inspired by ToHPluginUtils - ZerothAngel's Bukkit plugin library. 
 
-#Plugin example
+##Plugin example
+The easiest way to generate a plugin is just putting the annotationPlugin ainssi that the version of this one. I would try to automate the version.
+The class where you put `@Plugin` must extends `JavaPlugin`. You could put what do you want on it, the Framework will take it into account.
 ```java
     
     @Plugin(version ="0.1") // The plugin name will be 'economy'
     public class Economy extends JavaPlugin {
-        @Override
-        public void onEnable() {
-            super.onEnable();
-            // personal stuff
-        }
         ...
     }
 ```
@@ -25,15 +22,10 @@ You can also specified the plugin name like that :
 ```java
     @Plugin(name = "my_plugin", version ="0.1") // The plugin name will be 'my_plugin'
     public class Economy extends JavaPlugin {
-        @Override
-        public void onEnable() {
-            super.onEnable();
-            // personal stuff
-        }
         ...
     }
 ```
-#Command example
+##Command example
 
 ```java
    @Console
