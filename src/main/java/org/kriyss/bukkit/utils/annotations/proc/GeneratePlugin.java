@@ -56,16 +56,6 @@ public class GeneratePlugin extends AbstractProcessor{
         return true;
     }
 
-    private <T extends HasPermission> T populatePermission(Element element, T hasPermission) {
-        Permission permission = element.getAnnotation(Permission.class);
-        if(permission != null){
-            String permissionValue = StringUtils.isNotBlank(permission.value()) ? permission.value() : getElementLower(element);
-            hasPermission.withPermission(permissionValue);
-            hasPermission.withPermissionMessage(permission.message());
-        }
-        return hasPermission;
-    }
-
     private List<CommandGroupEntity> getCommandGroupEntities(RoundEnvironment roundEnv) {
         List<CommandGroupEntity> commandGroupEntities = Lists.newArrayList();
         for (Element commGr : roundEnv.getElementsAnnotatedWith(CommandGroup.class)) {
@@ -89,24 +79,10 @@ public class GeneratePlugin extends AbstractProcessor{
         List<CommandEntity> commandEntities = Lists.newArrayList();
         for (Element method : commandGroupClass.getEnclosedElements()) {
             if (containsAnnotation(method, Command.class)){
-                commandEntities.add(getCommandEntityBuilder(method));
+                commandEntities.add(populateCommand(method));
             }
         }
         return commandEntities;
-    }
-
-    private CommandEntity getCommandEntityBuilder(Element methodElement) {
-        System.out.println("-- Command scanned : " + methodElement.getSimpleName());
-        Command command = methodElement.getAnnotation(Command.class);
-
-        CommandEntityBuilder commandEntityBuilder = CommandEntityBuilder.aCommandEntity()
-                .withCommandValue(getDefaultOrValue(methodElement, command.name()))
-                .withFordAdmin(containsAnnotation(methodElement, Admin.class))
-                .withForConsole(containsAnnotation(methodElement, Console.class))
-                .withDescription(command.description())
-                .withParamEntities(getParamEntities(methodElement));
-
-        return populatePermission(methodElement, commandEntityBuilder).build();
     }
 
     private List<ParamEntity> getParamEntities(Element elementmethod) {
@@ -129,6 +105,30 @@ public class GeneratePlugin extends AbstractProcessor{
                 .withMin(param.min())
                 .withIsRequired(param.required())
                 .build();
+    }
+
+    private CommandEntity populateCommand(Element methodElement) {
+        System.out.println("-- Command scanned : " + methodElement.getSimpleName());
+        Command command = methodElement.getAnnotation(Command.class);
+
+        CommandEntityBuilder commandEntityBuilder = CommandEntityBuilder.aCommandEntity()
+                .withCommandValue(getDefaultOrValue(methodElement, command.name()))
+                .withFordAdmin(containsAnnotation(methodElement, Admin.class))
+                .withForConsole(containsAnnotation(methodElement, Console.class))
+                .withDescription(command.description())
+                .withParamEntities(getParamEntities(methodElement));
+
+        return populatePermission(methodElement, commandEntityBuilder).build();
+    }
+
+    private <T extends HasPermission> T populatePermission(Element element, T hasPermission) {
+        Permission permission = element.getAnnotation(Permission.class);
+        if(permission != null){
+            String permissionValue = StringUtils.isNotBlank(permission.value()) ? permission.value() : getElementLower(element);
+            hasPermission.withPermission(permissionValue);
+            hasPermission.withPermissionMessage(permission.message());
+        }
+        return hasPermission;
     }
 
 }
