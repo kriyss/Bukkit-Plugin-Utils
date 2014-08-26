@@ -49,6 +49,7 @@ A `@Command` is a method that you can manage permission of many commands with an
 Thanks to the `@Command`, the application will generate plugin.xml, with usage, name, description etc...
 All test like player is present, no null/empty passed, min, max etc, will be managed by the Framework.
 Like the Framework makes all at the compile time, you will can see generated code to be sure that the work is good.
+The `CommandSender` will be automaticaly injected.
 ```java
    @Command(description = "give money to another player")
    public boolean give(CommandSender sender, @Param String player, @Param int amount){
@@ -63,4 +64,4 @@ For example this command will generate this :
         usage: /give [player] [amount] 
 ```
 
-More example on the [Wiki](https://github.com/kriyss/Bukkit-Plugin-Utils/wiki)
+More example and explanation on the [Wiki](https://github.com/kriyss/Bukkit-Plugin-Utils/wiki)
