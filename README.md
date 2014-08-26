@@ -6,6 +6,10 @@ The framework create automaticaly the plugin.yml, permissions.yml etc...
 
 He is also inspired by ToHPluginUtils - ZerothAngel's Bukkit plugin library. 
 
+##TODO :
+* managed permission
+* generate code
+
 ##Plugin :
 The easiest way to generate a plugin is just putting the annotation `@Plugin` with the version of this one. I would try to automate the version.<br>
 The class where you put `@Plugin` must extends `JavaPlugin`. You could put what do you want on it, the Framework will take it into account.
