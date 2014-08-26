@@ -2,20 +2,16 @@ package org.kriyss.bukkit.utils.annotations.proc;
 
 import com.google.common.collect.Lists;
 import org.kriyss.bukkit.utils.annotations.Plugin;
-import org.kriyss.bukkit.utils.annotations.command.Arg;
 import org.kriyss.bukkit.utils.annotations.command.Command;
 import org.kriyss.bukkit.utils.annotations.command.CommandGroup;
+import org.kriyss.bukkit.utils.annotations.command.Param;
 import org.kriyss.bukkit.utils.annotations.permission.Admin;
 import org.kriyss.bukkit.utils.annotations.permission.Console;
 import org.kriyss.bukkit.utils.annotations.permission.Permission;
-import org.kriyss.bukkit.utils.annotations.proc.entity.ArgEntity;
 import org.kriyss.bukkit.utils.annotations.proc.entity.CommandEntity;
 import org.kriyss.bukkit.utils.annotations.proc.entity.CommandGroupEntity;
-import org.kriyss.bukkit.utils.annotations.proc.entity.builder.ArgEntityBuilder;
-import org.kriyss.bukkit.utils.annotations.proc.entity.builder.CommandEntityBuilder;
-import org.kriyss.bukkit.utils.annotations.proc.entity.builder.CommandGroupEntityBuilder;
-import org.kriyss.bukkit.utils.annotations.proc.entity.builder.PluginEntityBuilder;
-import org.kriyss.bukkit.utils.annotations.proc.utils.PluginYMLUtils;
+import org.kriyss.bukkit.utils.annotations.proc.entity.ParamEntity;
+import org.kriyss.bukkit.utils.annotations.proc.entity.builder.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -24,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.kriyss.bukkit.utils.annotations.proc.utils.BukkitUtils.*;
+import static org.kriyss.bukkit.utils.annotations.proc.utils.PluginYMLUtils.generateConfigFileSource;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 @SupportedAnnotationTypes("org.kriyss.bukkit.utils.annotations.Plugin")
@@ -42,30 +39,41 @@ public class GeneratePlugin extends AbstractProcessor{
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        PluginEntityBuilder pluginBuilder = PluginEntityBuilder.aPluginEntity();
+       // Generation of Plugin
         for (Element element : roundEnv.getElementsAnnotatedWith(Plugin.class)) {
             Plugin plugin = element.getAnnotation(Plugin.class);
-            String name = getDefaultOrValue(element, plugin.name());
-            pluginBuilder.withName(name)
-                   .withVersion(plugin.version())
-                   .withCompleteClassName(element.toString());
-            pluginName = name;
-            pluginBuilder.withCommandGroups(getCommandGroupEntities(roundEnv));
-            System.out.println(pluginBuilder.build());
-            String sourceCode = PluginYMLUtils.generateConfigFileSource(pluginBuilder.build());
-            createNewPluginConfigFile(filer, messager, sourceCode);
-        }
 
+            // Retrieve information for generate plugin
+            PluginEntityBuilder pluginBuilder = PluginEntityBuilder.aPluginEntity()
+                    .withName(getDefaultOrValue(element, plugin.name()))
+                    .withVersion(plugin.version())
+                    .withCompleteClassName(element.toString())
+                    .withCommandGroups(getCommandGroupEntities(roundEnv));
+
+            // Get Permission Global
+            pluginBuilder = populatePermission(element, pluginBuilder);
+
+            // Creation of file 'plugin.yml'
+            createNewPluginConfigFile(filer, messager, generateConfigFileSource(pluginBuilder.build()));
+        }
         return true;
+    }
+
+    private <T extends HasPermission> T populatePermission(Element element, T t) {
+        Permission permission = element.getAnnotation(Permission.class);
+        if(permission != null){
+            System.out.println("---- Permission value : " + permission.value());
+            System.out.println("---- Permission messa : " + permission.message());
+            t.withPermission(permission.value());
+            t.withPermissionMessage(permission.message());
+        }
+        return t;
     }
 
     private List<CommandGroupEntity> getCommandGroupEntities(RoundEnvironment roundEnv) {
         List<CommandGroupEntity> commandGroupEntities = Lists.newArrayList();
         for (Element commGr : roundEnv.getElementsAnnotatedWith(CommandGroup.class)) {
-            commandGroupEntities.add(
-                    getCommandGroupEntityBuilder(commGr)
-                        .withCommands(getCommandEntities(commGr))
-                        .build());
+            commandGroupEntities.add(getCommandGroupEntityBuilder(commGr).build());
         }
         return commandGroupEntities;
     }
@@ -76,15 +84,9 @@ public class GeneratePlugin extends AbstractProcessor{
                 .withCompleteClassName(commGr.toString())
                 .withRootCommand(commGr.getAnnotation(CommandGroup.class).value())
                 .withFordAdmin(containsAnnotation(commGr, Admin.class))
-                .withForConsole(containsAnnotation(commGr, Console.class));
-
-        Permission permission = getPermissionForElement(commGr);
-        boolean permissionIsPresent = permission != null;
-        if(permissionIsPresent){
-            groupEntityBuilder.withPermission(permission.value())
-                    .withPermissionMessage(permission.message());
-        }
-        return groupEntityBuilder;
+                .withForConsole(containsAnnotation(commGr, Console.class))
+                .withCommands(getCommandEntities(commGr));
+        return populatePermission(commGr, groupEntityBuilder);
     }
 
     private List<CommandEntity> getCommandEntities(Element commandGroupClass) {
@@ -93,7 +95,7 @@ public class GeneratePlugin extends AbstractProcessor{
             if (containsAnnotation(method, Command.class)){
                 commandEntities.add(
                         getCommandEntityBuilder(method)
-                            .withArgEntities(getArgEntities(method))
+                            .withParamEntities(getParamEntities(method))
                             .build());
             }
         }
@@ -110,40 +112,26 @@ public class GeneratePlugin extends AbstractProcessor{
                 .withForConsole(containsAnnotation(methodElement, Console.class))
                 .withDescription(command.description());
 
-        Permission permission = getPermissionForElement(methodElement);
-        boolean permissionIsPresent = permission != null;
-        if(permissionIsPresent){
-            commandEntityBuilder.withPermission(permission.value())
-                                .withPermissionMessage(permission.message());
-        }
-
-        return commandEntityBuilder;
+        return populatePermission(methodElement, commandEntityBuilder);
     }
 
-    private List<ArgEntity> getArgEntities(Element elementmethod) {
-        List<ArgEntity> argEntities = Lists.newArrayList();
+    private List<ParamEntity> getParamEntities(Element elementmethod) {
+        List<ParamEntity> paramEntities = Lists.newArrayList();
         if(elementmethod.getKind() == ElementKind.METHOD) {
             for (VariableElement parameter : ((ExecutableElement) elementmethod).getParameters()) {
-                Arg arg = parameter.getAnnotation(Arg.class);
-                if (arg != null){
-                    argEntities.add(
-                            ArgEntityBuilder.anArgEntity()
-                                .withName(getDefaultOrValue(parameter, arg.value()))
-                                .withMax(arg.max())
-                                .withMin(arg.min())
-                                .withIsRequired(arg.required())
-                                .build());
+                Param param = parameter.getAnnotation(Param.class);
+                if (param != null){
+                    paramEntities.add(
+                            ParamEntityBuilder.anParamEntity()
+                                    .withName(getDefaultOrValue(parameter, param.value()))
+                                    .withMax(param.max())
+                                    .withMin(param.min())
+                                    .withIsRequired(param.required())
+                                    .build());
                 }
             }
         }
-        return argEntities;
+        return paramEntities;
     }
 
-    private Permission getPermissionForElement(Element commGr) {
-        Permission permissionForMethod = commGr.getAnnotation(Permission.class);
-        if(containsAnnotation(commGr, Permission.class)) {
-            return permissionForMethod;
-        }
-        return null;
-    }
 }

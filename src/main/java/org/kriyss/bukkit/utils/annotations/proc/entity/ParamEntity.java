@@ -2,7 +2,7 @@ package org.kriyss.bukkit.utils.annotations.proc.entity;
 
 import com.google.common.base.Objects;
 
-public class ArgEntity {
+public class ParamEntity {
     private String name;
     private boolean required;
     private int min;

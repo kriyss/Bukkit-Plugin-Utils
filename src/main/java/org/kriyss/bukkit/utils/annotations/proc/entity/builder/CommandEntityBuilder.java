@@ -1,16 +1,16 @@
 package org.kriyss.bukkit.utils.annotations.proc.entity.builder;
 
-import org.kriyss.bukkit.utils.annotations.proc.entity.ArgEntity;
+import org.kriyss.bukkit.utils.annotations.proc.entity.ParamEntity;
 import org.kriyss.bukkit.utils.annotations.proc.entity.CommandEntity;
 
 import java.util.List;
 
-public class CommandEntityBuilder {
+public class CommandEntityBuilder implements HasPermission<CommandEntityBuilder> {
     private String commandValue;
     private String description;
     private String permission;
     private String permissionMessage;
-    private List<ArgEntity> argEntities;
+    private List<ParamEntity> argEntities;
     private boolean fordAdmin = false;
     private boolean forConsole = false;
 
@@ -51,7 +51,7 @@ public class CommandEntityBuilder {
         return this;
     }
 
-    public CommandEntityBuilder withArgEntities(List<ArgEntity> argEntities) {
+    public CommandEntityBuilder withParamEntities(List<ParamEntity> argEntities) {
         this.argEntities = argEntities;
         return this;
     }

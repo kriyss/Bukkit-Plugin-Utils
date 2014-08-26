@@ -9,5 +9,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD})
 public @interface Permission {
     String value() default "";
+    String completeValue() default "";
     String message() default "You are not allowed to execute this command";
 }

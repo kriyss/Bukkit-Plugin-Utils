@@ -5,6 +5,8 @@ import com.google.common.base.Objects;
 import java.util.List;
 
 public class PluginEntity {
+    private String permission;
+    private String permissionMessage;
     private String name;
     private String version;
     private String completeClassName;
@@ -42,9 +44,27 @@ public class PluginEntity {
         this.completeClassName = completeClassName;
     }
 
+    public String getPermission() {
+        return permission;
+    }
+
+    public void setPermission(String permission) {
+        this.permission = permission;
+    }
+
+    public String getPermissionMessage() {
+        return permissionMessage;
+    }
+
+    public void setPermissionMessage(String permissionMessage) {
+        this.permissionMessage = permissionMessage;
+    }
+
     @Override
     public String toString() {
-        return "\n"+Objects.toStringHelper(this)
+        return Objects.toStringHelper(this)
+                .add("permission", permission)
+                .add("permissionMessage", permissionMessage)
                 .add("name", name)
                 .add("version", version)
                 .add("completeClassName", completeClassName)

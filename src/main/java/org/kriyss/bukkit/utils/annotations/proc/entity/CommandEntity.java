@@ -11,7 +11,7 @@ public class CommandEntity {
     private String permissionMessage;
     private boolean fordAdmin = false;
     private boolean forConsole = false;
-    private List<ArgEntity> argEntities;
+    private List<ParamEntity> argEntities;
 
 
     public String getCommandValue() {
@@ -54,11 +54,11 @@ public class CommandEntity {
         this.forConsole = forConsole;
     }
 
-    public List<ArgEntity> getArgEntities() {
+    public List<ParamEntity> getArgEntities() {
         return argEntities;
     }
 
-    public void setArgEntities(List<ArgEntity> argEntities) {
+    public void setArgEntities(List<ParamEntity> argEntities) {
         this.argEntities = argEntities;
     }
     public String getPermissionMessage() {

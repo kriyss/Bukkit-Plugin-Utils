@@ -5,8 +5,10 @@ import org.kriyss.bukkit.utils.annotations.proc.entity.PluginEntity;
 
 import java.util.List;
 
-public class PluginEntityBuilder {
+public class PluginEntityBuilder implements HasPermission<PluginEntityBuilder> {
     private String name;
+    private String permission;
+    private String permissionMessage;
     private String version;
     private String completeClassName;
     private List<CommandGroupEntity> commandGroups;
@@ -38,12 +40,24 @@ public class PluginEntityBuilder {
         return this;
     }
 
+    public PluginEntityBuilder withPermission(String permission) {
+        this.permission = permission;
+        return this;
+    }
+
+    public PluginEntityBuilder withPermissionMessage(String permissionMessage) {
+        this.permissionMessage = permissionMessage;
+        return this;
+    }
+
     public PluginEntity build() {
         PluginEntity pluginEntity = new PluginEntity();
         pluginEntity.setName(name);
         pluginEntity.setVersion(version);
         pluginEntity.setCompleteClassName(completeClassName);
         pluginEntity.setCommandGroups(commandGroups);
+        pluginEntity.setPermission(permission);
+        pluginEntity.setPermissionMessage(permissionMessage);
         return pluginEntity;
     }
 }

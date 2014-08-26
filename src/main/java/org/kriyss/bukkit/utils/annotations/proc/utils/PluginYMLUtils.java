@@ -1,7 +1,7 @@
 package org.kriyss.bukkit.utils.annotations.proc.utils;
 
 import org.apache.commons.lang.StringUtils;
-import org.kriyss.bukkit.utils.annotations.proc.entity.ArgEntity;
+import org.kriyss.bukkit.utils.annotations.proc.entity.ParamEntity;
 import org.kriyss.bukkit.utils.annotations.proc.entity.CommandEntity;
 import org.kriyss.bukkit.utils.annotations.proc.entity.CommandGroupEntity;
 import org.kriyss.bukkit.utils.annotations.proc.entity.PluginEntity;
@@ -55,8 +55,8 @@ public class PluginYMLUtils {
 
     private static String getUsage(CommandGroupEntity groupEntity, CommandEntity commandEntity) {
         StringBuilder sbArg = new StringBuilder(format(ARG_COMMAND_PATTERN, groupEntity.getRootCommand() + commandEntity.getCommandValue()));
-        for (ArgEntity argEntity : commandEntity.getArgEntities()) {
-            sbArg.append(format(argEntity.isRequired() ? ARG_FIELD_PATTERN : ARG_FIELD_PATTERN_OPTIONNAL, argEntity.getName()));
+        for (ParamEntity paramEntity : commandEntity.getArgEntities()) {
+            sbArg.append(format(paramEntity.isRequired() ? ARG_FIELD_PATTERN : ARG_FIELD_PATTERN_OPTIONNAL, paramEntity.getName()));
         }
         return sbArg.toString();
     }

@@ -5,7 +5,7 @@ import org.kriyss.bukkit.utils.annotations.proc.entity.CommandGroupEntity;
 
 import java.util.List;
 
-public class CommandGroupEntityBuilder {
+public class CommandGroupEntityBuilder implements HasPermission<CommandGroupEntityBuilder> {
     private String rootCommand;
     private boolean fordAdmin = false;
     private boolean forConsole = false;
