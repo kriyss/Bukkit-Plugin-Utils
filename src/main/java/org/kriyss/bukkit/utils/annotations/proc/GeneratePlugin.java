@@ -1,6 +1,7 @@
 package org.kriyss.bukkit.utils.annotations.proc;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang.StringUtils;
 import org.kriyss.bukkit.utils.annotations.Plugin;
 import org.kriyss.bukkit.utils.annotations.command.Command;
 import org.kriyss.bukkit.utils.annotations.command.CommandGroup;
@@ -28,7 +29,6 @@ public class GeneratePlugin extends AbstractProcessor{
 
     private Filer filer;
     private Messager messager;
-    private String pluginName;
 
     @Override
     public void init(ProcessingEnvironment processingEnv) {
@@ -50,59 +50,52 @@ public class GeneratePlugin extends AbstractProcessor{
                     .withCompleteClassName(element.toString())
                     .withCommandGroups(getCommandGroupEntities(roundEnv));
 
-            // Get Permission Global
-            pluginBuilder = populatePermission(element, pluginBuilder);
-
             // Creation of file 'plugin.yml'
             createNewPluginConfigFile(filer, messager, generateConfigFileSource(pluginBuilder.build()));
         }
         return true;
     }
 
-    private <T extends HasPermission> T populatePermission(Element element, T t) {
+    private <T extends HasPermission> T populatePermission(Element element, T hasPermission) {
         Permission permission = element.getAnnotation(Permission.class);
         if(permission != null){
-            System.out.println("---- Permission value : " + permission.value());
-            System.out.println("---- Permission messa : " + permission.message());
-            t.withPermission(permission.value());
-            t.withPermissionMessage(permission.message());
+            String permissionValue = StringUtils.isNotBlank(permission.value()) ? permission.value() : getElementLower(element);
+            hasPermission.withPermission(permissionValue);
+            hasPermission.withPermissionMessage(permission.message());
         }
-        return t;
+        return hasPermission;
     }
 
     private List<CommandGroupEntity> getCommandGroupEntities(RoundEnvironment roundEnv) {
         List<CommandGroupEntity> commandGroupEntities = Lists.newArrayList();
         for (Element commGr : roundEnv.getElementsAnnotatedWith(CommandGroup.class)) {
-            commandGroupEntities.add(getCommandGroupEntityBuilder(commGr).build());
+            commandGroupEntities.add(populateCommandGroup(commGr));
         }
         return commandGroupEntities;
     }
 
-    private CommandGroupEntityBuilder getCommandGroupEntityBuilder(Element commGr) {
+    private CommandGroupEntity populateCommandGroup(Element commGr) {
         System.out.println("- Class scanned : "+ commGr.getSimpleName());
-        CommandGroupEntityBuilder groupEntityBuilder = CommandGroupEntityBuilder.aCommandGroupEntity()
+        return CommandGroupEntityBuilder.aCommandGroupEntity()
                 .withCompleteClassName(commGr.toString())
                 .withRootCommand(commGr.getAnnotation(CommandGroup.class).value())
                 .withFordAdmin(containsAnnotation(commGr, Admin.class))
                 .withForConsole(containsAnnotation(commGr, Console.class))
-                .withCommands(getCommandEntities(commGr));
-        return populatePermission(commGr, groupEntityBuilder);
+                .withCommands(getCommandEntities(commGr))
+                .build();
     }
 
     private List<CommandEntity> getCommandEntities(Element commandGroupClass) {
         List<CommandEntity> commandEntities = Lists.newArrayList();
         for (Element method : commandGroupClass.getEnclosedElements()) {
             if (containsAnnotation(method, Command.class)){
-                commandEntities.add(
-                        getCommandEntityBuilder(method)
-                            .withParamEntities(getParamEntities(method))
-                            .build());
+                commandEntities.add(getCommandEntityBuilder(method));
             }
         }
         return commandEntities;
     }
 
-    private CommandEntityBuilder getCommandEntityBuilder(Element methodElement) {
+    private CommandEntity getCommandEntityBuilder(Element methodElement) {
         System.out.println("-- Command scanned : " + methodElement.getSimpleName());
         Command command = methodElement.getAnnotation(Command.class);
 
@@ -110,9 +103,10 @@ public class GeneratePlugin extends AbstractProcessor{
                 .withCommandValue(getDefaultOrValue(methodElement, command.name()))
                 .withFordAdmin(containsAnnotation(methodElement, Admin.class))
                 .withForConsole(containsAnnotation(methodElement, Console.class))
-                .withDescription(command.description());
+                .withDescription(command.description())
+                .withParamEntities(getParamEntities(methodElement));
 
-        return populatePermission(methodElement, commandEntityBuilder);
+        return populatePermission(methodElement, commandEntityBuilder).build();
     }
 
     private List<ParamEntity> getParamEntities(Element elementmethod) {
@@ -121,17 +115,20 @@ public class GeneratePlugin extends AbstractProcessor{
             for (VariableElement parameter : ((ExecutableElement) elementmethod).getParameters()) {
                 Param param = parameter.getAnnotation(Param.class);
                 if (param != null){
-                    paramEntities.add(
-                            ParamEntityBuilder.anParamEntity()
-                                    .withName(getDefaultOrValue(parameter, param.value()))
-                                    .withMax(param.max())
-                                    .withMin(param.min())
-                                    .withIsRequired(param.required())
-                                    .build());
+                    paramEntities.add(populateParam(parameter, param));
                 }
             }
         }
         return paramEntities;
+    }
+
+    private ParamEntity populateParam(VariableElement parameter, Param param) {
+        return ParamEntityBuilder.anParamEntity()
+                .withName(getDefaultOrValue(parameter, param.value()))
+                .withMax(param.max())
+                .withMin(param.min())
+                .withIsRequired(param.required())
+                .build();
     }
 
 }
