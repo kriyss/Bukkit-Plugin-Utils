@@ -66,13 +66,13 @@ public class GeneratePlugin extends AbstractProcessor{
 
     private CommandGroupEntity populateCommandGroup(Element commGr) {
         System.out.println("- Class scanned : "+ commGr.getSimpleName());
-        return CommandGroupEntityBuilder.aCommandGroupEntity()
+        CommandGroupEntityBuilder builder = CommandGroupEntityBuilder.aCommandGroupEntity()
                 .withCompleteClassName(commGr.toString())
                 .withRootCommand(commGr.getAnnotation(CommandGroup.class).value())
                 .withFordAdmin(containsAnnotation(commGr, Admin.class))
                 .withForConsole(containsAnnotation(commGr, Console.class))
-                .withCommands(getCommandEntities(commGr))
-                .build();
+                .withCommands(getCommandEntities(commGr));
+        return populatePermission(commGr, builder).build();
     }
 
     private List<CommandEntity> getCommandEntities(Element commandGroupClass) {
