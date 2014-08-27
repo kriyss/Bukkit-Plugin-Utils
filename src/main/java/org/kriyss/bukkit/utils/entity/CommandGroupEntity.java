@@ -4,7 +4,7 @@ import com.google.common.base.Objects;
 
 import java.util.List;
 
-public class CommandGroupEntity {
+public class CommandGroupEntity implements HasPermission{
 
 
     private PermissionEntity permission;

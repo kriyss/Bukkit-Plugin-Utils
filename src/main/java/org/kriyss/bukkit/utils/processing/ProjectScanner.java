@@ -11,7 +11,6 @@ import org.kriyss.bukkit.utils.annotations.permission.Console;
 import org.kriyss.bukkit.utils.annotations.permission.Permission;
 import org.kriyss.bukkit.utils.entity.*;
 import org.kriyss.bukkit.utils.entity.builder.*;
-import org.kriyss.bukkit.utils.processing.utils.BukkitUtils;
 
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
@@ -20,11 +19,14 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import java.util.List;
 
+import static org.kriyss.bukkit.utils.processing.utils.BukkitUtils.*;
+
 public class ProjectScanner {
 
-    public static PluginEntity getPluginEntityBuilder(RoundEnvironment roundEnv, Element element, Plugin plugin) {
+    public static PluginEntity getPluginEntityBuilder(RoundEnvironment roundEnv, Element element) {
+        Plugin plugin = element.getAnnotation(Plugin.class);
         return PluginEntityBuilder.aPluginEntity()
-                .withName(BukkitUtils.getDefaultOrValue(element, plugin.name()))
+                .withName(getValueOrDefault(element, plugin.name()))
                 .withVersion(plugin.version())
                 .withCompleteClassName(element.toString())
                 .withCommandGroups(getCommandGroupEntities(roundEnv))
@@ -44,14 +46,14 @@ public class ProjectScanner {
                 .withCompleteClassName(commGr.toString())
                 .withRootCommand(commGr.getAnnotation(CommandGroup.class).value())
                 .withCommands(getCommandEntities(commGr))
-                .withPermission(getPermission(commGr))
+                .withPermission(populatePermission(commGr))
                 .build();
     }
 
     private static List<CommandEntity> getCommandEntities(Element commandGroupClass) {
         List<CommandEntity> commandEntities = Lists.newArrayList();
         for (Element method : commandGroupClass.getEnclosedElements()) {
-            if (BukkitUtils.containsAnnotation(method, Command.class)){
+            if (containsAnnotation(method, Command.class)){
                 commandEntities.add(populateCommand(method));
             }
         }
@@ -73,7 +75,7 @@ public class ProjectScanner {
 
     private static ParamEntity populateParam(VariableElement parameter, Param param) {
         return ParamEntityBuilder.aParamEntity()
-                .withName(BukkitUtils.getDefaultOrValue(parameter, param.value()))
+                .withName(getValueOrDefault(parameter, param.value()))
                 .withMax(param.max())
                 .withMin(param.min())
                 .withRequired(param.required())
@@ -83,21 +85,21 @@ public class ProjectScanner {
     private static CommandEntity populateCommand(Element methodElement) {
         Command command = methodElement.getAnnotation(Command.class);
         return CommandEntityBuilder.aCommandEntity()
-                .withCommandValue(BukkitUtils.getDefaultOrValue(methodElement, command.name()))
+                .withCommandValue(getValueOrDefault(methodElement, command.name()))
                 .withDescription(command.description())
-                .withPermission(getPermission(methodElement))
+                .withPermission(populatePermission(methodElement))
                 .withParamEntities(getParamEntities(methodElement))
                 .build();
     }
 
-    private static PermissionEntity getPermission(Element element) {
+    private static PermissionEntity populatePermission(Element element) {
         Permission permission = element.getAnnotation(Permission.class);
         PermissionEntity permissionEntity = new PermissionEntity();
         if(permission != null){
-            String permissionValue = StringUtils.isNotBlank(permission.value()) ? permission.value() : BukkitUtils.getElementLower(element);
+            String permissionValue = StringUtils.isNotBlank(permission.value()) ? permission.value() : getElementLower(element);
             permissionEntity = PermissionEntityBuilder.aPermissionEntity()
-                    .withForAdmin(BukkitUtils.containsAnnotation(element, Admin.class))
-                    .withForConsole(BukkitUtils.containsAnnotation(element, Console.class))
+                    .withForAdmin(containsAnnotation(element, Admin.class))
+                    .withForConsole(containsAnnotation(element, Console.class))
                     .withMessage(permission.message())
                     .withValue(permissionValue)
                     .build();

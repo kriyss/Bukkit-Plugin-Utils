@@ -35,24 +35,23 @@ public class PluginYMLUtils {
 
         for (CommandGroupEntity groupEntity : plug.getCommandGroups()) {
             for (CommandEntity commandEntity : groupEntity.getCommands()) {
-                ymlFileBuilder.append(getCommandYmlPart(groupEntity, commandEntity, plug.getName()));
+                ymlFileBuilder.append(getCommandYmlPart(groupEntity, commandEntity, plug));
             }
         }
         return ymlFileBuilder.toString();
     }
 
-    private static String getCommandYmlPart(CommandGroupEntity group, CommandEntity command, String pluginName) {
+    private static String getCommandYmlPart(CommandGroupEntity group, CommandEntity command, PluginEntity plugin) {
         // This part are always valued
         StringBuilder sb = new StringBuilder(format(COMMAND_YML_NAME, group.getRootCommand() + command.getCommandValue()));
         sb.append(format(COMMAND_YML_DESCRIPTION, command.getDescription()));
         sb.append(format(COMMAND_YML_USAGE, getUsage(group, command)));
 
         // Permission may be optionnal
-        String permission = concatIfNotNull(".", pluginName, group.getPermission().getValue(), command.getPermission().getValue());
+        String permission = PermissionUtils.generatePermission(plugin.getName(), plugin, group, command);
         if (StringUtils.isNotBlank(permission)) {
             sb.append(format(COMMAND_YML_PERMISSION, permission));
-            sb.append(format(COMMAND_YML_PERMISSION_MESSAGE,
-                    getPermissionMessageOrDefault("You can't do that", command.getPermission().getMessage(), group.getPermission().getMessage())));
+            sb.append(format(COMMAND_YML_PERMISSION_MESSAGE,PermissionUtils.getPermissionMessage(command, group)));
         }
         return sb.toString();
     }
@@ -63,20 +62,5 @@ public class PluginYMLUtils {
             sbArg.append(format(paramEntity.isRequired() ? ARG_FIELD_PATTERN : ARG_FIELD_PATTERN_OPTIONNAL, paramEntity.getName()));
         }
         return sbArg.toString();
-    }
-
-    private static String concatIfNotNull(String separator, String... element){
-        StringBuilder sb = new StringBuilder();
-        for (String s : element) {
-            if(StringUtils.isNotBlank(s)) sb.append(s).append(separator);
-        }
-        return sb.substring(0, sb.lastIndexOf(separator));
-    }
-
-    private static String getPermissionMessageOrDefault(String defaultMessage, String... permissionMessages){
-        for (String s : permissionMessages) {
-            if(StringUtils.isNotBlank(s)) return s;
-        }
-        return defaultMessage;
     }
 }

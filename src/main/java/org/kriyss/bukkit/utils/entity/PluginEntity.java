@@ -4,7 +4,7 @@ import com.google.common.base.Objects;
 
 import java.util.List;
 
-public class PluginEntity {
+public class PluginEntity implements HasPermission{
     private String name;
     private String version;
     private String completeClassName;

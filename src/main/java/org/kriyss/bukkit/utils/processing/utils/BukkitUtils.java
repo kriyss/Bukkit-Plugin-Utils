@@ -54,7 +54,7 @@ public class BukkitUtils {
         return element != null && element.getAnnotation(annotation) != null;
     }
 
-    public static String getDefaultOrValue(Element element, String value) {
+    public static String getValueOrDefault(Element element, String value) {
         return "".equals(value) ? getElementLower(element) : value;
     }
     public static String getElementLower(Element element) {

@@ -28,10 +28,12 @@ public class GeneratePlugin extends AbstractProcessor{
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
        // Generation of Plugin
-        for (Element element : roundEnv.getElementsAnnotatedWith(Plugin.class)) {
-            Plugin plugin = element.getAnnotation(Plugin.class);
+        Set<? extends Element> pluginElements = roundEnv.getElementsAnnotatedWith(Plugin.class);
+        BukkitUtils.hasJustOneResult(pluginElements);
+
+        for (Element element : pluginElements) {
             // Retrieve information for generate plugin
-            PluginEntity pluginEntity = ProjectScanner.getPluginEntityBuilder(roundEnv, element, plugin);
+            PluginEntity pluginEntity = ProjectScanner.getPluginEntityBuilder(roundEnv, element);
             // Creation of file 'plugin.yml'
             BukkitUtils.createNewPluginConfigFile(filer, messager, PluginYMLUtils.generateConfigFileSource(pluginEntity));
             // Creation of

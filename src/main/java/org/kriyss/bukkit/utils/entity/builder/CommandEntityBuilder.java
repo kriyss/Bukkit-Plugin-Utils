@@ -6,9 +6,6 @@ import org.kriyss.bukkit.utils.entity.PermissionEntity;
 
 import java.util.List;
 
-/**
- * Created on 27/08/2014.
- */
 public class CommandEntityBuilder {
     private PermissionEntity permission;
     private String commandValue;
