@@ -11,5 +11,6 @@ public @interface Param {
     String value() default "";
     int min() default Integer.MIN_VALUE;
     int max() default Integer.MAX_VALUE;
+    String regexp() default "";
     boolean required() default true;
 }

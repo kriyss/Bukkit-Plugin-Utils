@@ -5,13 +5,11 @@ import com.google.common.base.Objects;
 import java.util.List;
 
 public class CommandEntity {
+
+    private PermissionEntity permission;
     private String commandValue;
     private String description;
-    private String permission;
-    private String permissionMessage;
-    private boolean fordAdmin = false;
-    private boolean forConsole = false;
-    private List<ParamEntity> argEntities;
+    private List<ParamEntity> paramEntities;
 
 
     public String getCommandValue() {
@@ -30,55 +28,28 @@ public class CommandEntity {
         this.description = description;
     }
 
-    public String getPermission() {
+    public List<ParamEntity> getParamEntities() {
+        return paramEntities;
+    }
+
+    public void setParamEntities(List<ParamEntity> paramEntities) {
+        this.paramEntities = paramEntities;
+    }
+
+    public PermissionEntity getPermission() {
         return permission;
     }
 
-    public void setPermission(String permission) {
+    public void setPermission(PermissionEntity permission) {
         this.permission = permission;
     }
-
-    public boolean isFordAdmin() {
-        return fordAdmin;
-    }
-
-    public void setFordAdmin(boolean fordAdmin) {
-        this.fordAdmin = fordAdmin;
-    }
-
-    public boolean isForConsole() {
-        return forConsole;
-    }
-
-    public void setForConsole(boolean forConsole) {
-        this.forConsole = forConsole;
-    }
-
-    public List<ParamEntity> getArgEntities() {
-        return argEntities;
-    }
-
-    public void setArgEntities(List<ParamEntity> argEntities) {
-        this.argEntities = argEntities;
-    }
-    public String getPermissionMessage() {
-        return permissionMessage;
-    }
-
-    public void setPermissionMessage(String permissionMessage) {
-        this.permissionMessage = permissionMessage;
-    }
-
     @Override
     public String toString() {
-        return "\n\t\t"+Objects.toStringHelper(this)
-                .add("\tcommandValue", commandValue)
-                .add("\tdescription", description)
-                .add("\tpermission", permission)
-                .add("\tpermissionMessage", permissionMessage)
-                .add("\tfordAdmin", fordAdmin)
-                .add("\tforConsole", forConsole)
-                .add("\targEntities", argEntities)
+        return Objects.toStringHelper(this)
+                .add("permission", permission)
+                .add("commandValue", commandValue)
+                .add("description", description)
+                .add("paramEntities", paramEntities)
                 .toString();
     }
 }

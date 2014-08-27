@@ -48,17 +48,18 @@ public class PluginYMLUtils {
         sb.append(format(COMMAND_YML_USAGE, getUsage(group, command)));
 
         // Permission may be optionnal
-        String permission = concatIfNotNull(".", pluginName, group.getPermission(), command.getPermission());
+        String permission = concatIfNotNull(".", pluginName, group.getPermission().getValue(), command.getPermission().getValue());
         if (StringUtils.isNotBlank(permission)) {
             sb.append(format(COMMAND_YML_PERMISSION, permission));
-            sb.append(format(COMMAND_YML_PERMISSION_MESSAGE, getPermissionMessageOrDefault("You can't do that", command.getPermissionMessage(), group.getPermissionMessage())));
+            sb.append(format(COMMAND_YML_PERMISSION_MESSAGE,
+                    getPermissionMessageOrDefault("You can't do that", command.getPermission().getMessage(), group.getPermission().getMessage())));
         }
         return sb.toString();
     }
 
     private static String getUsage(CommandGroupEntity groupEntity, CommandEntity commandEntity) {
         StringBuilder sbArg = new StringBuilder(format(ARG_COMMAND_PATTERN, groupEntity.getRootCommand() + commandEntity.getCommandValue()));
-        for (ParamEntity paramEntity : commandEntity.getArgEntities()) {
+        for (ParamEntity paramEntity : commandEntity.getParamEntities()) {
             sbArg.append(format(paramEntity.isRequired() ? ARG_FIELD_PATTERN : ARG_FIELD_PATTERN_OPTIONNAL, paramEntity.getName()));
         }
         return sbArg.toString();

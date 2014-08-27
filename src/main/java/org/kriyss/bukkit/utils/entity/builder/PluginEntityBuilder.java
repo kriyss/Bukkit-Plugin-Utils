@@ -1,17 +1,20 @@
 package org.kriyss.bukkit.utils.entity.builder;
 
 import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
+import org.kriyss.bukkit.utils.entity.PermissionEntity;
 import org.kriyss.bukkit.utils.entity.PluginEntity;
 
 import java.util.List;
 
-public class PluginEntityBuilder implements HasPermission<PluginEntityBuilder> {
+/**
+ * Created on 27/08/2014.
+ */
+public class PluginEntityBuilder {
     private String name;
-    private String permission;
-    private String permissionMessage;
     private String version;
     private String completeClassName;
     private List<CommandGroupEntity> commandGroups;
+    private PermissionEntity permission;
 
     private PluginEntityBuilder() {
     }
@@ -40,13 +43,8 @@ public class PluginEntityBuilder implements HasPermission<PluginEntityBuilder> {
         return this;
     }
 
-    public PluginEntityBuilder withPermission(String permission) {
+    public PluginEntityBuilder withPermission(PermissionEntity permission) {
         this.permission = permission;
-        return this;
-    }
-
-    public PluginEntityBuilder withPermissionMessage(String permissionMessage) {
-        this.permissionMessage = permissionMessage;
         return this;
     }
 
@@ -57,7 +55,6 @@ public class PluginEntityBuilder implements HasPermission<PluginEntityBuilder> {
         pluginEntity.setCompleteClassName(completeClassName);
         pluginEntity.setCommandGroups(commandGroups);
         pluginEntity.setPermission(permission);
-        pluginEntity.setPermissionMessage(permissionMessage);
         return pluginEntity;
     }
 }

@@ -2,23 +2,29 @@ package org.kriyss.bukkit.utils.entity.builder;
 
 import org.kriyss.bukkit.utils.entity.CommandEntity;
 import org.kriyss.bukkit.utils.entity.ParamEntity;
+import org.kriyss.bukkit.utils.entity.PermissionEntity;
 
 import java.util.List;
 
-public class CommandEntityBuilder implements HasPermission<CommandEntityBuilder> {
+/**
+ * Created on 27/08/2014.
+ */
+public class CommandEntityBuilder {
+    private PermissionEntity permission;
     private String commandValue;
     private String description;
-    private String permission;
-    private String permissionMessage;
-    private List<ParamEntity> argEntities;
-    private boolean fordAdmin = false;
-    private boolean forConsole = false;
+    private List<ParamEntity> paramEntities;
 
     private CommandEntityBuilder() {
     }
 
     public static CommandEntityBuilder aCommandEntity() {
         return new CommandEntityBuilder();
+    }
+
+    public CommandEntityBuilder withPermission(PermissionEntity permission) {
+        this.permission = permission;
+        return this;
     }
 
     public CommandEntityBuilder withCommandValue(String commandValue) {
@@ -31,40 +37,17 @@ public class CommandEntityBuilder implements HasPermission<CommandEntityBuilder>
         return this;
     }
 
-    public CommandEntityBuilder withPermission(String permission) {
-        this.permission = permission;
-        return this;
-    }
-
-    public CommandEntityBuilder withPermissionMessage(String permissionMessage) {
-        this.permissionMessage = permissionMessage;
-        return this;
-    }
-
-    public CommandEntityBuilder withFordAdmin(boolean fordAdmin) {
-        this.fordAdmin = fordAdmin;
-        return this;
-    }
-
-    public CommandEntityBuilder withForConsole(boolean forConsole) {
-        this.forConsole = forConsole;
-        return this;
-    }
-
-    public CommandEntityBuilder withParamEntities(List<ParamEntity> argEntities) {
-        this.argEntities = argEntities;
+    public CommandEntityBuilder withParamEntities(List<ParamEntity> paramEntities) {
+        this.paramEntities = paramEntities;
         return this;
     }
 
     public CommandEntity build() {
         CommandEntity commandEntity = new CommandEntity();
+        commandEntity.setPermission(permission);
         commandEntity.setCommandValue(commandValue);
         commandEntity.setDescription(description);
-        commandEntity.setPermission(permission);
-        commandEntity.setPermissionMessage(permissionMessage);
-        commandEntity.setFordAdmin(fordAdmin);
-        commandEntity.setForConsole(forConsole);
-        commandEntity.setArgEntities(argEntities);
+        commandEntity.setParamEntities(paramEntities);
         return commandEntity;
     }
 }

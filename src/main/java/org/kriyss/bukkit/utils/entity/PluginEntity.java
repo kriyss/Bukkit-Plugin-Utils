@@ -5,12 +5,11 @@ import com.google.common.base.Objects;
 import java.util.List;
 
 public class PluginEntity {
-    private String permission;
-    private String permissionMessage;
     private String name;
     private String version;
     private String completeClassName;
     private List<CommandGroupEntity> commandGroups;
+    private PermissionEntity permission;
 
     public String getName() {
         return name;
@@ -44,31 +43,22 @@ public class PluginEntity {
         this.completeClassName = completeClassName;
     }
 
-    public String getPermission() {
-        return permission;
-    }
-
-    public void setPermission(String permission) {
+    public void setPermission(PermissionEntity permission) {
         this.permission = permission;
     }
 
-    public String getPermissionMessage() {
-        return permissionMessage;
-    }
-
-    public void setPermissionMessage(String permissionMessage) {
-        this.permissionMessage = permissionMessage;
+    public PermissionEntity getPermission() {
+        return permission;
     }
 
     @Override
     public String toString() {
         return Objects.toStringHelper(this)
-                .add("permission", permission)
-                .add("permissionMessage", permissionMessage)
                 .add("name", name)
                 .add("version", version)
                 .add("completeClassName", completeClassName)
                 .add("commandGroups", commandGroups)
+                .add("permission", permission)
                 .toString();
     }
 }
