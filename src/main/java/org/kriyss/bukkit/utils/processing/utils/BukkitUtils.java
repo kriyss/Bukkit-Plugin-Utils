@@ -14,6 +14,8 @@ import java.util.Set;
 
 public class BukkitUtils {
 
+    public static final String SEPARATOR = ".";
+
     private BukkitUtils() {}
 
     public static void createNewPluginConfigFile(Filer filer, Messager messager, String sourceCode) {
@@ -31,7 +33,7 @@ public class BukkitUtils {
 
     public static void createNewJavaFile(Filer filer, Messager messager, String className, String packageName, String sourceCode, String suffix) {
         try {
-            String name = packageName + "." + className + suffix;
+            String name = packageName + SEPARATOR + className + suffix;
 
             JavaFileObject sourceFile = filer.createSourceFile(name);
 
@@ -53,18 +55,16 @@ public class BukkitUtils {
     public static <A extends Annotation> boolean containsAnnotation(Element element, Class<A> annotation){
         return element != null && element.getAnnotation(annotation) != null;
     }
-
     public static String getValueOrDefault(Element element, String value) {
         return "".equals(value) ? getElementLower(element) : value;
     }
     public static String getElementLower(Element element) {
         return element.getSimpleName().toString().toLowerCase();
     }
-
     public static String getClassName(Element element){
         return element.getSimpleName().toString();
     }
     public static String getPackageName(Element element){
-        return element.toString().substring(0,element.toString().lastIndexOf("."));
+        return element.toString().substring(0,element.toString().lastIndexOf(SEPARATOR));
     }
 }

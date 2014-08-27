@@ -30,8 +30,11 @@ public class PluginYMLUtils {
 
     public static String generateConfigFileSource(PluginEntity plug) {
         StringBuilder ymlFileBuilder =
-                new StringBuilder(format(YML_HEADER, plug.getName(), plug.getCompleteClassName(), plug.getVersion()))
-                                .append(COMMAND_YML_HEADER);
+                new StringBuilder(format(YML_HEADER,
+                        plug.getName(),
+                        plug.getCompleteClassName(),
+                        plug.getVersion()))
+                    .append(COMMAND_YML_HEADER);
 
         for (CommandGroupEntity groupEntity : plug.getCommandGroups()) {
             for (CommandEntity commandEntity : groupEntity.getCommands()) {
