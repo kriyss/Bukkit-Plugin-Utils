@@ -17,6 +17,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 import java.util.List;
 
 import static org.kriyss.bukkit.utils.processing.utils.BukkitUtils.*;
@@ -66,14 +67,14 @@ public class ProjectScanner {
             for (VariableElement parameter : ((ExecutableElement) elementmethod).getParameters()) {
                 Param param = parameter.getAnnotation(Param.class);
                 if (param != null){
-                    paramEntities.add(populateParam(parameter, param, parameter.asType().toString()));
+                    paramEntities.add(populateParam(parameter, param, parameter.asType()));
                 }
             }
         }
         return paramEntities;
     }
 
-    private static ParamEntity populateParam(VariableElement parameter, Param param, String type) {
+    private static ParamEntity populateParam(VariableElement parameter, Param param, TypeMirror type) {
         return ParamEntityBuilder.aParamEntity()
                 .withName(getValueOrDefault(parameter, param.value()))
                 .withMax(param.max())

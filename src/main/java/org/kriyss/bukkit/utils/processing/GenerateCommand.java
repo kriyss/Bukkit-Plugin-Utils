@@ -4,7 +4,7 @@ import org.kriyss.bukkit.utils.Const;
 import org.kriyss.bukkit.utils.entity.CommandEntity;
 import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
 import org.kriyss.bukkit.utils.entity.ParamEntity;
-import org.kriyss.bukkit.utils.entity.PluginEntity;
+import org.kriyss.bukkit.utils.processing.utils.BukkitUtils;
 
 import java.text.MessageFormat;
 
@@ -13,7 +13,9 @@ import java.text.MessageFormat;
  */
 public class GenerateCommand {
 
-    static final String COMMAND_EXECUTOR_PATTERN =
+    private static final String STRING_VARIABLE_DECLARATION = "\t\tString {0} = strings[{1}];";
+    private static final String INTEGER_VARIABLE_DECLARATION = "\t\tint {0} = Integer.valueOf(strings[{1}]);";
+    private static final String COMMAND_EXECUTOR_PATTERN =
             "package {0};\n\n"
                     + "import {1};\n"
                     + "import org.apache.commons.lang.StringUtils;\n"
@@ -33,69 +35,99 @@ public class GenerateCommand {
 
                     + "'}'";
 
-    public static String generate(PluginEntity plugin, CommandGroupEntity commandGroup, CommandEntity command) {
-        final String completeClassName = commandGroup.getCompleteClassName();
-        String packageTarget = completeClassName.substring(0, completeClassName.lastIndexOf('.'));
+    public static String generate(CommandGroupEntity commandGroup, CommandEntity command) {
+        String completeClassName = commandGroup.getCompleteClassName();
+        String packageTarget = BukkitUtils.getPackageFromCompleteClass(commandGroup);
+        String className = BukkitUtils.getCommandExecutorClass(commandGroup, command);
+        String extendsOf = BukkitUtils.getClassFromCompleteName(completeClassName);
 
-
-        String className = Character.toUpperCase(command.getCommandMethodName().charAt(0)) + command.getCommandMethodName().substring(1);
-
-        String extendsOf = completeClassName.substring(completeClassName.lastIndexOf('.') + 1, completeClassName.length());
-
-        StringBuilder sb1 = new StringBuilder();
-        int i = 0;
-        for (ParamEntity paramEntity : command.getParamEntities()) {
-            if (paramEntity.getType().equals("java.lang.String")) {
-                sb1.append("\t\tString ")
-                        .append(paramEntity.getName())
-                        .append(" = strings[")
-                        .append(i)
-                        .append("];\n");
-            } else if (paramEntity.getType().equals("int")) {
-                sb1.append("\t\tint ")
-                        .append(paramEntity.getName())
-                        .append(" = Integer.valueOf(strings[")
-                        .append(i)
-                        .append("]);\n");
-            }
-            i++;
-        }
         //TODO permission avant !!!!
-
         // verfication
-        StringBuilder sb2 = new StringBuilder();
-        for (ParamEntity paramEntity : command.getParamEntities()) {
-            if (paramEntity.getType().equals("java.lang.String")) {
-                if (paramEntity.isRequired()) {
-                    sb2.append("\t\tif(StringUtils.isBlank(")
-                            .append(paramEntity.getName())
-                            .append(")){\n\t\t\tcommandSender.sendMessage(\"[")
-                            .append(paramEntity.getName())
-                            .append("] is required\");\n\t\t\treturn false;\n\t\t}\n");
-                }
-                sb2.append("\t\tif(").append(paramEntity.getName()).append(".length() <").append(paramEntity.getMin())
-                        .append("){\n\t\t\tcommandSender.sendMessage(\"[")
-                        .append(paramEntity.getName()).append("] has to be highter than ").append(paramEntity.getMin()).append("\");\n\t\t\treturn false;\n\t\t}\n");
+        String declaratedVariablesSource = generateVariablesSource(command);
+        String checks = generateChecks(command);
+        String methodCall = generateSuperMethodCall(command);
 
-                sb2.append("\t\tif(").append(paramEntity.getName()).append(".length() >").append(paramEntity.getMax())
-                        .append("){\n\t\t\tcommandSender.sendMessage(\"[")
-                        .append(paramEntity.getName()).append("] has to be smaller than ").append(paramEntity.getMax()).append("\");\n\t\t\treturn false;\n\t\t}\n");
-            }else if(paramEntity.getType().equals("int")){
-                sb2.append("\t\tif(").append(paramEntity.getName()).append(" <").append(paramEntity.getMin())
-                        .append("){\n\t\t\tcommandSender.sendMessage(\"[")
-                        .append(paramEntity.getName()).append("] has to be highter than ").append(paramEntity.getMin()).append("\");\n\t\t\treturn false;\n\t\t}\n");
+        return MessageFormat.format(COMMAND_EXECUTOR_PATTERN,
+                packageTarget,
+                completeClassName,
+                className,
+                extendsOf,
+                declaratedVariablesSource,
+                checks,
+                methodCall);
+    }
 
-                sb2.append("\t\tif(").append(paramEntity.getName()).append(" >").append(paramEntity.getMax())
-                        .append("){\n\t\t\tcommandSender.sendMessage(\"[")
-                        .append(paramEntity.getName()).append("] has to be smaller than ").append(paramEntity.getMax()).append("\");\n\t\t\treturn false;\n\t\t}\n");
-            }
-        }
-
+    private static String generateSuperMethodCall(CommandEntity command) {
         StringBuilder sb = new StringBuilder(command.getCommandMethodName()+"(commandSender");
         for (ParamEntity paramEntity : command.getParamEntities()) {
             sb.append(", ").append(paramEntity.getName());
         }
         sb.append(")");
-        return MessageFormat.format(COMMAND_EXECUTOR_PATTERN, packageTarget, completeClassName, className, extendsOf, sb1,sb2, sb);
+        return sb.toString();
+    }
+
+    private static String generateChecks(CommandEntity command) {
+        StringBuilder checks = new StringBuilder();
+        for (ParamEntity paramEntity : command.getParamEntities()) {
+            if (BukkitUtils.isString(paramEntity.getType())) {
+                checks.append(generateStringChecks(paramEntity));
+            }else if(BukkitUtils.isInteger(paramEntity.getType())){
+                checks.append(generateIntegerChecks(paramEntity));
+            }
+        }
+        return checks.toString();
+    }
+
+    private static String generateIntegerChecks(ParamEntity paramEntity) {
+        StringBuilder sb2 = new StringBuilder("\t\tif(")
+                .append(paramEntity.getName())
+                .append(" <").append(paramEntity.getMin())
+                .append("){\n\t\t\tcommandSender.sendMessage(\"[")
+                .append(paramEntity.getName())
+                .append("] has to be highter than ")
+                .append(paramEntity.getMin())
+                .append("\");\n\t\t\treturn false;\n\t\t}\n")
+                .append("\t\tif(")
+                .append(paramEntity.getName())
+                .append(" >")
+                .append(paramEntity.getMax())
+                .append("){\n\t\t\tcommandSender.sendMessage(\"[")
+                .append(paramEntity.getName())
+                .append("] has to be smaller than ")
+                .append(paramEntity.getMax())
+                .append("\");\n\t\t\treturn false;\n\t\t}\n");
+        return sb2.toString();
+    }
+
+    private static String generateStringChecks(ParamEntity paramEntity) {
+        StringBuilder checks = new StringBuilder();
+        if (paramEntity.isRequired()) {
+            checks.append("\t\tif(StringUtils.isBlank(")
+                    .append(paramEntity.getName())
+                    .append(")){\n\t\t\tcommandSender.sendMessage(\"[")
+                    .append(paramEntity.getName())
+                    .append("] is required\");\n\t\t\treturn false;\n\t\t}\n");
+        }
+        checks.append("\t\tif(").append(paramEntity.getName()).append(".length() <").append(paramEntity.getMin())
+                .append("){\n\t\t\tcommandSender.sendMessage(\"[")
+                .append(paramEntity.getName()).append("] has to be highter than ").append(paramEntity.getMin()).append("\");\n\t\t\treturn false;\n\t\t}\n")
+                .append("\t\tif(").append(paramEntity.getName()).append(".length() >").append(paramEntity.getMax())
+                .append("){\n\t\t\tcommandSender.sendMessage(\"[")
+                .append(paramEntity.getName()).append("] has to be smaller than ").append(paramEntity.getMax()).append("\");\n\t\t\treturn false;\n\t\t}\n");
+        return checks.toString();
+    }
+
+    private static String generateVariablesSource(CommandEntity command) {
+        StringBuilder declaratedVariablesSource = new StringBuilder();
+        int argsNumber = 0;
+        for (ParamEntity paramEntity : command.getParamEntities()) {
+            if (BukkitUtils.isString(paramEntity.getType())) {
+                declaratedVariablesSource.append(MessageFormat.format(STRING_VARIABLE_DECLARATION, paramEntity.getName(), argsNumber));
+            } else if (BukkitUtils.isInteger(paramEntity.getType())) {
+                declaratedVariablesSource.append(MessageFormat.format(INTEGER_VARIABLE_DECLARATION, paramEntity.getName(), argsNumber));
+            }
+            argsNumber++;
+        }
+        return declaratedVariablesSource.toString();
     }
 }

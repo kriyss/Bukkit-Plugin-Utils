@@ -2,12 +2,14 @@ package org.kriyss.bukkit.utils.entity;
 
 import com.google.common.base.Objects;
 
+import javax.lang.model.type.TypeMirror;
+
 public class ParamEntity {
     private String name;
     private boolean required;
     private int min;
     private int max;
-    private String type;
+    private TypeMirror type;
 
     public String getName() {
         return name;
@@ -41,11 +43,11 @@ public class ParamEntity {
         this.required = required;
     }
 
-    public String getType() {
+    public TypeMirror getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(TypeMirror type) {
         this.type = type;
     }
 

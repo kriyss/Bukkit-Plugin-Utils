@@ -2,8 +2,6 @@
 //
 //public interface GenerationConstant {
 //
-//    static final String COMMAND_SUFFIX = "Executor";
-//    static final String PLUGIN_SUFFIX = "Launcher";
 //
 //    static final String PERMISSION = "\tpublic static final Permission $NAME$ = new Permission(\"$VALUE\");\n";
 //

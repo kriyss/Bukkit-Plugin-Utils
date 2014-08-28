@@ -1,8 +1,13 @@
 package org.kriyss.bukkit.utils.processing.utils;
 
+import org.apache.commons.lang.StringUtils;
+import org.kriyss.bukkit.utils.entity.CommandEntity;
+import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
+
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
+import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import javax.tools.FileObject;
 import javax.tools.JavaFileObject;
@@ -31,9 +36,9 @@ public class BukkitUtils {
         }
     }
 
-    public static void createNewJavaFile(Filer filer, Messager messager, String className, String packageName, String sourceCode, String suffix) {
+    public static void createNewJavaFile(Filer filer, Messager messager, String completeClass, String sourceCode, String suffix) {
         try {
-            String name = packageName + SEPARATOR + className + suffix;
+            String name = completeClass + suffix;
 
             JavaFileObject sourceFile = filer.createSourceFile(name);
 
@@ -66,5 +71,24 @@ public class BukkitUtils {
     }
     public static String getPackageName(Element element){
         return element.toString().substring(0,element.toString().lastIndexOf(SEPARATOR));
+    }
+    public static String getClassFromCompleteName(String completeClassName) {
+        return completeClassName.substring(completeClassName.lastIndexOf('.') + 1, completeClassName.length());
+    }
+    public static String getCommandExecutorClass(CommandGroupEntity commandGroup, CommandEntity command) {
+        return StringUtils.capitalize(commandGroup.getRootCommand()) +  StringUtils.capitalize(command.getCommandMethodName());
+    }
+    public static String getPackageFromCompleteClass(CommandGroupEntity groupEntity) {
+        return groupEntity.getCompleteClassName().substring(0, groupEntity.getCompleteClassName().lastIndexOf('.'));
+    }
+    public static String getCompleteCommandExecutorClass(CommandGroupEntity group, CommandEntity command){
+        return getPackageFromCompleteClass(group)+SEPARATOR+getCommandExecutorClass(group, command);
+    }
+    public static boolean isInteger(TypeMirror typeMirror) {
+        return typeMirror.toString().equals("java.lang.Integer") || typeMirror.toString().equals("int");
+    }
+
+    public static boolean isString(TypeMirror typeMirror) {
+        return typeMirror.toString().equals("java.lang.String");
     }
 }

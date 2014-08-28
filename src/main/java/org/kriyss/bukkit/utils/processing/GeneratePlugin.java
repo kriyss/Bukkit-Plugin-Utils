@@ -1,5 +1,6 @@
 package org.kriyss.bukkit.utils.processing;
 
+import com.google.common.collect.Lists;
 import org.kriyss.bukkit.utils.Const;
 import org.kriyss.bukkit.utils.annotations.Plugin;
 import org.kriyss.bukkit.utils.entity.CommandEntity;
@@ -12,6 +13,7 @@ import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import java.util.List;
 import java.util.Set;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
@@ -40,20 +42,26 @@ public class GeneratePlugin extends AbstractProcessor{
             // Generation of file 'plugin.yml'
             BukkitUtils.createNewPluginConfigFile(filer, messager, PluginYMLUtils.generateConfigFileSource(pluginEntity));
             // Generation of CommandExecutor
-            for (CommandGroupEntity groupEntity : pluginEntity.getCommandGroups()) {
-                for (CommandEntity commandEntity : groupEntity.getCommands()) {
-                    String src = GenerateCommand.generate(pluginEntity, groupEntity, commandEntity);
-                    BukkitUtils.createNewJavaFile(filer, messager,
-                            Character.toUpperCase(commandEntity.getCommandMethodName().charAt(0)) + commandEntity.getCommandMethodName().substring(1),
-                            groupEntity.getCompleteClassName().substring(0, groupEntity.getCompleteClassName().lastIndexOf('.'))
-                            ,src,
-                            Const.SUFFIX_COMMAND_CLASS);
-                }
-
-            }
-
+            List<String> commandExecutorsClasses = generateCommandExecutors(pluginEntity);
             // Generation of Plugin class with CommandExcecutor
         }
         return true;
+    }
+
+    private List<String> generateCommandExecutors(PluginEntity pluginEntity) {
+        List<String> completeCommandExecutorClass = Lists.newArrayList();
+        for (CommandGroupEntity groupEntity : pluginEntity.getCommandGroups()) {
+            for (CommandEntity commandEntity : groupEntity.getCommands()) {
+                completeCommandExecutorClass.add(generateCommandExecutor(groupEntity, commandEntity));
+            }
+        }
+        return completeCommandExecutorClass;
+    }
+
+    private String generateCommandExecutor(CommandGroupEntity groupEntity, CommandEntity commandEntity) {
+        String src = GenerateCommand.generate(groupEntity, commandEntity);
+        final String commandExecutorcompleteClass = BukkitUtils.getCompleteCommandExecutorClass(groupEntity, commandEntity);
+        BukkitUtils.createNewJavaFile(filer, messager, commandExecutorcompleteClass, src, Const.SUFFIX_COMMAND_CLASS);
+        return commandExecutorcompleteClass;
     }
 }

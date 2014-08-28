@@ -2,6 +2,8 @@ package org.kriyss.bukkit.utils.entity.builder;
 
 import org.kriyss.bukkit.utils.entity.ParamEntity;
 
+import javax.lang.model.type.TypeMirror;
+
 /**
  * Created on 28/08/2014.
  */
@@ -10,7 +12,7 @@ public class ParamEntityBuilder {
     private boolean required;
     private int min;
     private int max;
-    private String type;
+    private TypeMirror type;
 
     private ParamEntityBuilder() {
     }
@@ -39,7 +41,7 @@ public class ParamEntityBuilder {
         return this;
     }
 
-    public ParamEntityBuilder withType(String type) {
+    public ParamEntityBuilder withType(TypeMirror type) {
         this.type = type;
         return this;
     }
