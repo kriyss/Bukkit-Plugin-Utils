@@ -8,17 +8,16 @@ import org.kriyss.bukkit.utils.processing.utils.BukkitUtils;
 
 import java.text.MessageFormat;
 
-/**
- * Created on 28/08/2014.
- */
 public class GenerateCommand {
 
-    private static final String STRING_VARIABLE_DECLARATION = "\t\tString {0} = strings[{1}];";
-    private static final String INTEGER_VARIABLE_DECLARATION = "\t\tint {0} = Integer.valueOf(strings[{1}]);";
+    private static final String STRING_VARIABLE_DECLARATION = "\t\tString {0} = strings[{1}];\n";
+    private static final String INTEGER_VARIABLE_DECLARATION = "\t\tint {0} = Integer.valueOf(strings[{1}]);\n";
     private static final String COMMAND_EXECUTOR_PATTERN =
             "package {0};\n\n"
                     + "import {1};\n"
                     + "import org.apache.commons.lang.StringUtils;\n"
+                    + "import java.util.List;\n"
+                    + "import java.util.ArrayList;\n"
                     + "import org.bukkit.command.Command;\n"
                     + "import org.bukkit.command.CommandExecutor;\n"
                     + "import org.bukkit.ChatColor;\n"
@@ -28,11 +27,11 @@ public class GenerateCommand {
                     +"  extends {3} implements CommandExecutor'{'\n"
                     + "\t@Override\n"
                     + "\tpublic boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) '{'\n"
+                    + "\t\tList<String> errors = new ArrayList<String>();\n"
                     + "{4}"
                     + "{5}"
                     + "\t\treturn super.{6};\n"
                     + "\t'}'\n"
-
                     + "'}'";
 
     public static String generate(CommandGroupEntity commandGroup, CommandEntity command) {
@@ -62,8 +61,7 @@ public class GenerateCommand {
         for (ParamEntity paramEntity : command.getParamEntities()) {
             sb.append(", ").append(paramEntity.getName());
         }
-        sb.append(")");
-        return sb.toString();
+        return sb.append(")").toString();
     }
 
     private static String generateChecks(CommandEntity command) {
@@ -82,20 +80,20 @@ public class GenerateCommand {
         StringBuilder sb2 = new StringBuilder("\t\tif(")
                 .append(paramEntity.getName())
                 .append(" <").append(paramEntity.getMin())
-                .append("){\n\t\t\tcommandSender.sendMessage(\"[")
+                .append("){\n\t\t\terrors.add(\"[")
                 .append(paramEntity.getName())
                 .append("] has to be highter than ")
                 .append(paramEntity.getMin())
-                .append("\");\n\t\t\treturn false;\n\t\t}\n")
+                .append("\");\n\t\t}\n")
                 .append("\t\tif(")
                 .append(paramEntity.getName())
                 .append(" >")
                 .append(paramEntity.getMax())
-                .append("){\n\t\t\tcommandSender.sendMessage(\"[")
+                .append("){\n\t\t\terrors.add(\"[")
                 .append(paramEntity.getName())
                 .append("] has to be smaller than ")
                 .append(paramEntity.getMax())
-                .append("\");\n\t\t\treturn false;\n\t\t}\n");
+                .append("\");\n\t\t}\n");
         return sb2.toString();
     }
 
@@ -104,16 +102,16 @@ public class GenerateCommand {
         if (paramEntity.isRequired()) {
             checks.append("\t\tif(StringUtils.isBlank(")
                     .append(paramEntity.getName())
-                    .append(")){\n\t\t\tcommandSender.sendMessage(\"[")
+                    .append(")){\n\t\t\terrors.add(\"[")
                     .append(paramEntity.getName())
-                    .append("] is required\");\n\t\t\treturn false;\n\t\t}\n");
+                    .append("] is required\");\n\t\t}\n");
         }
         checks.append("\t\tif(").append(paramEntity.getName()).append(".length() <").append(paramEntity.getMin())
-                .append("){\n\t\t\tcommandSender.sendMessage(\"[")
-                .append(paramEntity.getName()).append("] has to be highter than ").append(paramEntity.getMin()).append("\");\n\t\t\treturn false;\n\t\t}\n")
+                .append("){\n\t\t\terrors.add(\"[")
+                .append(paramEntity.getName()).append("] has to be highter than ").append(paramEntity.getMin()).append("\");\n\t\t}\n")
                 .append("\t\tif(").append(paramEntity.getName()).append(".length() >").append(paramEntity.getMax())
-                .append("){\n\t\t\tcommandSender.sendMessage(\"[")
-                .append(paramEntity.getName()).append("] has to be smaller than ").append(paramEntity.getMax()).append("\");\n\t\t\treturn false;\n\t\t}\n");
+                .append("){\n\t\t\terrors.add(\"[")
+                .append(paramEntity.getName()).append("] has to be smaller than ").append(paramEntity.getMax()).append("\");\n\t\t}\n");
         return checks.toString();
     }
 
