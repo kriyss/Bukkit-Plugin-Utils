@@ -7,6 +7,7 @@ public class ParamEntity {
     private boolean required;
     private int min;
     private int max;
+    private String type;
 
     public String getName() {
         return name;
@@ -40,13 +41,22 @@ public class ParamEntity {
         this.required = required;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
-        return "\n\t\t\t"+Objects.toStringHelper(this)
-                .add("\tname", name)
-                .add("\trequired", required)
-                .add("\tmin", min)
-                .add("\tmax", max)
+        return Objects.toStringHelper(this)
+                .add("name", name)
+                .add("required", required)
+                .add("min", min)
+                .add("max", max)
+                .add("type", type)
                 .toString();
     }
 }

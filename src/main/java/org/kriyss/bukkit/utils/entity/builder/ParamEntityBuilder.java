@@ -3,13 +3,14 @@ package org.kriyss.bukkit.utils.entity.builder;
 import org.kriyss.bukkit.utils.entity.ParamEntity;
 
 /**
- * Created on 27/08/2014.
+ * Created on 28/08/2014.
  */
 public class ParamEntityBuilder {
     private String name;
     private boolean required;
     private int min;
     private int max;
+    private String type;
 
     private ParamEntityBuilder() {
     }
@@ -38,12 +39,18 @@ public class ParamEntityBuilder {
         return this;
     }
 
+    public ParamEntityBuilder withType(String type) {
+        this.type = type;
+        return this;
+    }
+
     public ParamEntity build() {
         ParamEntity paramEntity = new ParamEntity();
         paramEntity.setName(name);
         paramEntity.setRequired(required);
         paramEntity.setMin(min);
         paramEntity.setMax(max);
+        paramEntity.setType(type);
         return paramEntity;
     }
 }

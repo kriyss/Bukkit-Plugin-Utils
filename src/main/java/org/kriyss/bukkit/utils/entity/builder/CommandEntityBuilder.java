@@ -9,6 +9,7 @@ import java.util.List;
 public class CommandEntityBuilder {
     private PermissionEntity permission;
     private String commandValue;
+    private String commandMethodName;
     private String description;
     private List<ParamEntity> paramEntities;
 
@@ -39,12 +40,18 @@ public class CommandEntityBuilder {
         return this;
     }
 
+    public CommandEntityBuilder withCommandMethodName(String commandMethodName) {
+        this.commandMethodName = commandMethodName;
+        return this;
+    }
+
     public CommandEntity build() {
         CommandEntity commandEntity = new CommandEntity();
         commandEntity.setPermission(permission);
         commandEntity.setCommandValue(commandValue);
         commandEntity.setDescription(description);
         commandEntity.setParamEntities(paramEntities);
+        commandEntity.setCommandMethodName(commandMethodName);
         return commandEntity;
     }
 }

@@ -8,6 +8,7 @@ public class CommandEntity implements HasPermission {
 
     private PermissionEntity permission;
     private String commandValue;
+    private String commandMethodName;
     private String description;
     private List<ParamEntity> paramEntities;
 
@@ -43,11 +44,21 @@ public class CommandEntity implements HasPermission {
     public void setPermission(PermissionEntity permission) {
         this.permission = permission;
     }
+
+    public String getCommandMethodName() {
+        return commandMethodName;
+    }
+
+    public void setCommandMethodName(String commandMethodName) {
+        this.commandMethodName = commandMethodName;
+    }
+
     @Override
     public String toString() {
         return Objects.toStringHelper(this)
                 .add("permission", permission)
                 .add("commandValue", commandValue)
+                .add("commandMethodName", commandMethodName)
                 .add("description", description)
                 .add("paramEntities", paramEntities)
                 .toString();

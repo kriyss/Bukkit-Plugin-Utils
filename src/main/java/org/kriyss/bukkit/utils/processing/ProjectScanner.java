@@ -66,18 +66,19 @@ public class ProjectScanner {
             for (VariableElement parameter : ((ExecutableElement) elementmethod).getParameters()) {
                 Param param = parameter.getAnnotation(Param.class);
                 if (param != null){
-                    paramEntities.add(populateParam(parameter, param));
+                    paramEntities.add(populateParam(parameter, param, parameter.asType().toString()));
                 }
             }
         }
         return paramEntities;
     }
 
-    private static ParamEntity populateParam(VariableElement parameter, Param param) {
+    private static ParamEntity populateParam(VariableElement parameter, Param param, String type) {
         return ParamEntityBuilder.aParamEntity()
                 .withName(getValueOrDefault(parameter, param.value()))
                 .withMax(param.max())
                 .withMin(param.min())
+                .withType(type)
                 .withRequired(param.required())
                 .build();
     }
@@ -85,6 +86,7 @@ public class ProjectScanner {
     private static CommandEntity populateCommand(Element methodElement) {
         Command command = methodElement.getAnnotation(Command.class);
         return CommandEntityBuilder.aCommandEntity()
+                .withCommandMethodName(methodElement.getSimpleName().toString())
                 .withCommandValue(getValueOrDefault(methodElement, command.name()))
                 .withDescription(command.description())
                 .withPermission(populatePermission(methodElement))
