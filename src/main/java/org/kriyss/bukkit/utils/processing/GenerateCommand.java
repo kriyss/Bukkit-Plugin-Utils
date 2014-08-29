@@ -30,7 +30,10 @@ public class GenerateCommand {
                     + "\t\tList<String> errors = new ArrayList<String>();\n"
                     + "{4}"
                     + "{5}"
-                    + "\t\tif(!errors.isEmpty()) \n\t\t\tfor(String message : errors) \n\t\t\t\tcommandSender.sendMessage(message);\n"
+                    + "\t\tif(!errors.isEmpty()) \n"
+                    + "\t\t\tfor(String message : errors) \n"
+                    + "\t\t\t\tcommandSender.sendMessage(message);\n"
+                    + "\t\t\t\treturn false;\n"
                     + "\t\treturn super.{6};\n"
                     + "\t'}'\n"
                     + "'}'";
