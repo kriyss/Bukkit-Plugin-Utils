@@ -11,7 +11,7 @@ import java.text.MessageFormat;
 public class GenerateCommand {
 
     private static final String STRING_VARIABLE_DECLARATION = "\t\tString {0} = strings[{1}];\n";
-    private static final String INTEGER_VARIABLE_DECLARATION = "\t\tint {0} = Integer.valueOf(strings[{1}]);\n";
+    private static final String INTEGER_VARIABLE_DECLARATION = "\t\tInteger {0} = strings[{1}] != null ? Integer.valueOf(strings[{1}]) : null;\n";
     private static final String COMMAND_EXECUTOR_PATTERN =
             "package {0};\n\n"
                     + "import {1};\n"
@@ -30,9 +30,29 @@ public class GenerateCommand {
                     + "\t\tList<String> errors = new ArrayList<String>();\n"
                     + "{4}"
                     + "{5}"
+                    + "\t\tif(!errors.isEmpty()) \n\t\t\tfor(String message : errors) \n\t\t\t\tcommandSender.sendMessage(message);\n"
                     + "\t\treturn super.{6};\n"
                     + "\t'}'\n"
                     + "'}'";
+    private static final String CHECK_STRING_REQUIRED = "\t\tif(StringUtils.isBlank({0}))'{'\n" +
+            "\t\t\terrors.add(\"[{0}] is required\");\n" +
+            "\t\t'}' else '{'\n" +
+            "{1} \t\t'}'\n";
+
+    private static final String CHECK_STRING = "\t\tif({0}.length() < {1})\n"
+            + "\t\t\t\terrors.add(\"[{0}] has to be highter than {1}\");\n"
+            + "\t\t\tif({0}.length() > {2})\n"
+            + "\t\t\t\terrors.add(\"[{0}] has to be smaller than {2}\");\n";
+    private static final String CHECK_INTEGER_REQUIRED = "\t\tif({0} != null)'{'\n" +
+            "\t\t\terrors.add(\"[{0}] is required\");\n" +
+            "\t\t'}' else '{'\n" +
+            "{1} \t\t'}'\n";
+
+    private static final String CHECK_INTEGER = "\t\tif({0} < {1})\n"
+            + "\t\t\terrors.add(\"[{0}}] has to be highter than {1}\");\n"
+            + "\t\t\n"
+            + "\t\tif({0} > {2})\n"
+            + "\t\t\terrors.add(\"[{0}] has to be smaller than {2}\");\n";
 
     public static String generate(CommandGroupEntity commandGroup, CommandEntity command) {
         String completeClassName = commandGroup.getCompleteClassName();
@@ -77,42 +97,13 @@ public class GenerateCommand {
     }
 
     private static String generateIntegerChecks(ParamEntity paramEntity) {
-        StringBuilder sb2 = new StringBuilder("\t\tif(")
-                .append(paramEntity.getName())
-                .append(" <").append(paramEntity.getMin())
-                .append("){\n\t\t\terrors.add(\"[")
-                .append(paramEntity.getName())
-                .append("] has to be highter than ")
-                .append(paramEntity.getMin())
-                .append("\");\n\t\t}\n")
-                .append("\t\tif(")
-                .append(paramEntity.getName())
-                .append(" >")
-                .append(paramEntity.getMax())
-                .append("){\n\t\t\terrors.add(\"[")
-                .append(paramEntity.getName())
-                .append("] has to be smaller than ")
-                .append(paramEntity.getMax())
-                .append("\");\n\t\t}\n");
-        return sb2.toString();
+        String check = MessageFormat.format(CHECK_INTEGER, paramEntity.getName(), Integer.toString(paramEntity.getMin()), Integer.toString(paramEntity.getMax()));
+        return paramEntity.isRequired() ? MessageFormat.format(CHECK_INTEGER_REQUIRED, paramEntity.getName(), check) : check;
     }
 
     private static String generateStringChecks(ParamEntity paramEntity) {
-        StringBuilder checks = new StringBuilder();
-        if (paramEntity.isRequired()) {
-            checks.append("\t\tif(StringUtils.isBlank(")
-                    .append(paramEntity.getName())
-                    .append(")){\n\t\t\terrors.add(\"[")
-                    .append(paramEntity.getName())
-                    .append("] is required\");\n\t\t}\n");
-        }
-        checks.append("\t\tif(").append(paramEntity.getName()).append(".length() <").append(paramEntity.getMin())
-                .append("){\n\t\t\terrors.add(\"[")
-                .append(paramEntity.getName()).append("] has to be highter than ").append(paramEntity.getMin()).append("\");\n\t\t}\n")
-                .append("\t\tif(").append(paramEntity.getName()).append(".length() >").append(paramEntity.getMax())
-                .append("){\n\t\t\terrors.add(\"[")
-                .append(paramEntity.getName()).append("] has to be smaller than ").append(paramEntity.getMax()).append("\");\n\t\t}\n");
-        return checks.toString();
+        String check = MessageFormat.format(CHECK_STRING, paramEntity.getName(), Integer.toString(paramEntity.getMin()), Integer.toString(paramEntity.getMax()));
+        return paramEntity.isRequired() ? MessageFormat.format(CHECK_STRING_REQUIRED, paramEntity.getName(), check) : check;
     }
 
     private static String generateVariablesSource(CommandEntity command) {
