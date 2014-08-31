@@ -1,6 +1,8 @@
 package org.kriyss.bukkit.utils.processing.utils;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.kriyss.bukkit.utils.Const;
 import org.kriyss.bukkit.utils.entity.ParamEntity;
 import org.kriyss.bukkit.utils.entity.CommandEntity;
 import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
@@ -15,7 +17,7 @@ public class PluginYMLUtils {
     }
 
     private static final String TAB                             = "    ";
-    private static final String YML_HEADER                      = "name: {0}\nmain: {1}\nversion: {2}\n";
+    private static final String YML_HEADER                      = "name: {0}\nmain: {1}"+Const.SUFFIX_PLUGIN_CLASS+"\nversion: {2}\n";
     private static final String COMMAND_YML_HEADER              = "commands: \n";
     private static final String COMMAND_YML_NAME = TAB + "{0}:\n";
     private static final String COMMAND_YML_DESCRIPTION         = TAB + TAB + "description: {0}\n";

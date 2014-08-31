@@ -1,5 +1,6 @@
 package org.kriyss.bukkit.utils.processing;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.kriyss.bukkit.utils.Const;
 import org.kriyss.bukkit.utils.entity.CommandEntity;
 import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
@@ -10,11 +11,12 @@ import java.text.MessageFormat;
 
 public class GenerateCommand {
 
-    private static final String STRING_VARIABLE_DECLARATION = "\t\tString {0} = strings[{1}];\n";
-    private static final String INTEGER_VARIABLE_DECLARATION = "\t\tInteger {0} = strings[{1}] != null ? Integer.valueOf(strings[{1}]) : null;\n";
+    private static final String STRING_VARIABLE_DECLARATION = "\t\tString {0} = ({1} < strings.length) ? strings[{1}] : null;\n";
+    private static final String INTEGER_VARIABLE_DECLARATION = "\t\tInteger {0} = ({1} < strings.length) && NumberUtils.isNumber(strings[{1}]) ? Integer.valueOf(strings[{1}]) : null;\n";
     private static final String COMMAND_EXECUTOR_PATTERN =
             "package {0};\n\n"
                     + "import {1};\n"
+                    + "import org.apache.commons.lang.math.NumberUtils;\n"
                     + "import org.apache.commons.lang.StringUtils;\n"
                     + "import java.util.List;\n"
                     + "import java.util.ArrayList;\n"
@@ -30,11 +32,12 @@ public class GenerateCommand {
                     + "\t\tList<String> errors = new ArrayList<String>();\n"
                     + "{4}"
                     + "{5}"
-                    + "\t\tif(!errors.isEmpty()) \n"
+                    + "\t\tif(!errors.isEmpty()) '{' \n"
                     + "\t\t\tfor(String message : errors)'{' \n"
                     + "\t\t\t\tcommandSender.sendMessage(message);\n"
-                    + "\t\t\t\treturn false;\n"
-                    + "\t\t\t\t'}'\n"
+                    + "\t\t\t'}'\n"
+                    + "\t\t\treturn true;\n"
+                    + "\t\t'}'\n"
                     + "\t\treturn super.{6};\n"
                     + "\t'}'\n"
                     + "'}'";
@@ -47,13 +50,15 @@ public class GenerateCommand {
             + "\t\t\t\terrors.add(\"[{0}] has to be highter than {1}\");\n"
             + "\t\t\tif({0}.length() > {2})\n"
             + "\t\t\t\terrors.add(\"[{0}] has to be smaller than {2}\");\n";
-    private static final String CHECK_INTEGER_REQUIRED = "\t\tif({0} != null)'{'\n" +
+    private static final String CHECK_INTEGER_REQUIRED = "\t\tif({0} == null)'{'\n" +
             "\t\t\terrors.add(\"[{0}] is required\");\n" +
             "\t\t'}' else '{'\n" +
             "{1} \t\t'}'\n";
+    private static final String CHECK_INTEGER_NOT_EQUIRED = "\t\tif({0} != null)'{'\n" +
+            "{1} \t\t'}'\n";
 
     private static final String CHECK_INTEGER = "\t\tif({0} < {1})\n"
-            + "\t\t\terrors.add(\"[{0}}] has to be highter than {1}\");\n"
+            + "\t\t\terrors.add(\"[{0}] has to be highter than {1}\");\n"
             + "\t\t\n"
             + "\t\tif({0} > {2})\n"
             + "\t\t\terrors.add(\"[{0}] has to be smaller than {2}\");\n";
@@ -102,7 +107,11 @@ public class GenerateCommand {
 
     private static String generateIntegerChecks(ParamEntity paramEntity) {
         String check = MessageFormat.format(CHECK_INTEGER, paramEntity.getName(), Integer.toString(paramEntity.getMin()), Integer.toString(paramEntity.getMax()));
-        return paramEntity.isRequired() ? MessageFormat.format(CHECK_INTEGER_REQUIRED, paramEntity.getName(), check) : check;
+        if (paramEntity.isRequired()){
+            return MessageFormat.format(CHECK_INTEGER_REQUIRED, paramEntity.getName(), check);
+        } else {
+            return MessageFormat.format(CHECK_INTEGER_NOT_EQUIRED, paramEntity.getName(), check);
+        }
     }
 
     private static String generateStringChecks(ParamEntity paramEntity) {

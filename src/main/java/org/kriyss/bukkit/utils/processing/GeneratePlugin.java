@@ -1,6 +1,7 @@
 package org.kriyss.bukkit.utils.processing;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.kriyss.bukkit.utils.Const;
 import org.kriyss.bukkit.utils.annotations.Plugin;
 import org.kriyss.bukkit.utils.entity.CommandEntity;
@@ -13,7 +14,10 @@ import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
@@ -42,17 +46,43 @@ public class GeneratePlugin extends AbstractProcessor{
             // Generation of file 'plugin.yml'
             BukkitUtils.createNewPluginConfigFile(filer, messager, PluginYMLUtils.generateConfigFileSource(pluginEntity));
             // Generation of CommandExecutor
-            List<String> commandExecutorsClasses = generateCommandExecutors(pluginEntity);
+            Map<String, String> commandExecutorsClasses = generateCommandExecutors(pluginEntity);
             // Generation of Plugin class with CommandExcecutor
+            String pluginSrc = generatePluginSource(commandExecutorsClasses, element);
+            BukkitUtils.createNewJavaFile(filer, messager, BukkitUtils.getClassName(element), pluginSrc, Const.SUFFIX_PLUGIN_CLASS );
         }
         return true;
     }
 
-    private List<String> generateCommandExecutors(PluginEntity pluginEntity) {
-        List<String> completeCommandExecutorClass = Lists.newArrayList();
+    private String generatePluginSource(Map<String, String> commandExecutorsClasses, Element element) {
+        String imortClasses = generateCommandExecutorImport(commandExecutorsClasses.values());
+        String commandEx = generategetCommand(commandExecutorsClasses);
+        return MessageFormat.format(Const.COMMAND_EXECUTOR_HEADER, BukkitUtils.getPackageName(element), imortClasses, BukkitUtils.getClassName(element),commandEx );
+    }
+
+    private String generategetCommand(Map<String, String> commandExecutorsClasses) {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, String> executorsClass : commandExecutorsClasses.entrySet()) {
+            sb.append(MessageFormat.format(Const.GET_COMMAND, executorsClass.getKey(), BukkitUtils.getClassFromCompleteName(executorsClass.getValue())));
+        }
+        return sb.toString();
+    }
+
+    private String generateCommandExecutorImport(Collection<String> commandExecutorsClasses) {
+        StringBuilder sb = new StringBuilder();
+        for (String executorsClass : commandExecutorsClasses) {
+            sb.append(MessageFormat.format(Const.IMPORT_EXECUTOR, executorsClass));
+        }
+        return sb.toString();
+
+    }
+
+    private Map<String, String> generateCommandExecutors(PluginEntity pluginEntity) {
+        Map<String, String> completeCommandExecutorClass = Maps.newHashMap();
         for (CommandGroupEntity groupEntity : pluginEntity.getCommandGroups()) {
             for (CommandEntity commandEntity : groupEntity.getCommands()) {
-                completeCommandExecutorClass.add(generateCommandExecutor(groupEntity, commandEntity));
+                completeCommandExecutorClass.put(
+                        groupEntity.getRootCommand() + commandEntity.getCommandValue(), generateCommandExecutor(groupEntity, commandEntity) + Const.SUFFIX_COMMAND_CLASS);
             }
         }
         return completeCommandExecutorClass;
