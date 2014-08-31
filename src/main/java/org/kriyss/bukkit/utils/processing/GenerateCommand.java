@@ -31,9 +31,10 @@ public class GenerateCommand {
                     + "{4}"
                     + "{5}"
                     + "\t\tif(!errors.isEmpty()) \n"
-                    + "\t\t\tfor(String message : errors) \n"
+                    + "\t\t\tfor(String message : errors)'{' \n"
                     + "\t\t\t\tcommandSender.sendMessage(message);\n"
                     + "\t\t\t\treturn false;\n"
+                    + "\t\t\t\t'}'\n"
                     + "\t\treturn super.{6};\n"
                     + "\t'}'\n"
                     + "'}'";
