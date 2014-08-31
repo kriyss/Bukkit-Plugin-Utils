@@ -41,14 +41,10 @@ public class GeneratePlugin extends AbstractProcessor{
         BukkitUtils.hasJustOneResult(pluginElements);
 
         for (Element element : pluginElements) {
-            // Retrieve information for generate plugin
             PluginEntity pluginEntity = ProjectScanner.getPluginEntityBuilder(roundEnv, element);
-            // Generation of file 'plugin.yml'
             BukkitUtils.createNewPluginConfigFile(filer, messager, PluginYMLUtils.generateConfigFileSource(pluginEntity));
-            // Generation of CommandExecutor
-            Map<String, String> commandExecutorsClasses = generateCommandExecutors(pluginEntity);
-            // Generation of Plugin class with CommandExcecutor
-            String pluginSrc = generatePluginSource(commandExecutorsClasses, element);
+
+            String pluginSrc = generatePluginSource(generateCommandExecutors(pluginEntity), element);
             BukkitUtils.createNewJavaFile(filer, messager, BukkitUtils.getClassName(element), pluginSrc, Const.SUFFIX_PLUGIN_CLASS );
         }
         return true;
