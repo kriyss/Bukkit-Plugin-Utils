@@ -7,8 +7,9 @@ The framework create automaticaly the plugin.yml, permissions.yml etc...
 He is also inspired by ToHPluginUtils - ZerothAngel's Bukkit plugin library. 
 
 ##TODO :
-* automatic EventHandler registration
 * managed permission
+* wiki
+* documentation
 
 ##Plugin :
 The easiest way to generate a plugin is just putting the annotation `@Plugin` with the version of this one. I would try to automate the version.<br>
