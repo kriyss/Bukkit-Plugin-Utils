@@ -69,6 +69,9 @@ public class BukkitUtils {
     public static String getClassName(Element element){
         return element.getSimpleName().toString();
     }
+    public static String getCompleteClassName(Element element){
+        return element.toString();
+    }
     public static String getPackageName(Element element){
         return element.toString().substring(0,element.toString().lastIndexOf(SEPARATOR));
     }

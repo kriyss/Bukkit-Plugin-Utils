@@ -1,7 +1,6 @@
 package org.kriyss.bukkit.utils.processing.utils;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.kriyss.bukkit.utils.Const;
 import org.kriyss.bukkit.utils.entity.ParamEntity;
 import org.kriyss.bukkit.utils.entity.CommandEntity;
@@ -19,7 +18,7 @@ public class PluginYMLUtils {
     private static final String TAB                             = "    ";
     private static final String YML_HEADER                      = "name: {0}\nmain: {1}"+Const.SUFFIX_PLUGIN_CLASS+"\nversion: {2}\n";
     private static final String COMMAND_YML_HEADER              = "commands: \n";
-    private static final String COMMAND_YML_NAME = TAB + "{0}:\n";
+    private static final String COMMAND_YML_NAME                = TAB + "{0}:\n";
     private static final String COMMAND_YML_DESCRIPTION         = TAB + TAB + "description: {0}\n";
     private static final String COMMAND_YML_USAGE               = TAB + TAB + "usage: {0}\n";
     private static final String COMMAND_YML_PERMISSION          = TAB + TAB + "permission: {0}\n";
@@ -27,8 +26,8 @@ public class PluginYMLUtils {
 
 
     private static final String ARG_COMMAND_PATTERN             = "/{0} ";
-    private static final String ARG_FIELD_PATTERN               = "[{0}] ";
-    private static final String ARG_FIELD_PATTERN_OPTIONNAL     = "[{0}(optionnal)] ";
+    private static final String PARAM_FIELD_PATTERN             = "[{0}] ";
+    private static final String PARAM_FIELD_PATTERN_OPTIONNAL   = "[{0}(optionnal)] ";
 
     public static String generateConfigFileSource(PluginEntity plug) {
         StringBuilder ymlFileBuilder =
@@ -64,7 +63,7 @@ public class PluginYMLUtils {
     private static String getUsage(CommandGroupEntity groupEntity, CommandEntity commandEntity) {
         StringBuilder sbArg = new StringBuilder(format(ARG_COMMAND_PATTERN, groupEntity.getRootCommand() + commandEntity.getCommandValue()));
         for (ParamEntity paramEntity : commandEntity.getParamEntities()) {
-            sbArg.append(format(paramEntity.isRequired() ? ARG_FIELD_PATTERN : ARG_FIELD_PATTERN_OPTIONNAL, paramEntity.getName()));
+            sbArg.append(format(paramEntity.isRequired() ? PARAM_FIELD_PATTERN : PARAM_FIELD_PATTERN_OPTIONNAL, paramEntity.getName()));
         }
         return sbArg.toString();
     }

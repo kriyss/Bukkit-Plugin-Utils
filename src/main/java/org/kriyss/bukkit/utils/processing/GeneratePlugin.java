@@ -1,6 +1,5 @@
 package org.kriyss.bukkit.utils.processing;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.kriyss.bukkit.utils.Const;
 import org.kriyss.bukkit.utils.annotations.Plugin;
@@ -8,6 +7,7 @@ import org.kriyss.bukkit.utils.entity.CommandEntity;
 import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
 import org.kriyss.bukkit.utils.entity.PluginEntity;
 import org.kriyss.bukkit.utils.processing.utils.BukkitUtils;
+import org.kriyss.bukkit.utils.processing.utils.EventHanlderScanner;
 import org.kriyss.bukkit.utils.processing.utils.PluginYMLUtils;
 
 import javax.annotation.processing.*;
@@ -44,16 +44,25 @@ public class GeneratePlugin extends AbstractProcessor{
             PluginEntity pluginEntity = ProjectScanner.getPluginEntityBuilder(roundEnv, element);
             BukkitUtils.createNewPluginConfigFile(filer, messager, PluginYMLUtils.generateConfigFileSource(pluginEntity));
 
-            String pluginSrc = generatePluginSource(generateCommandExecutors(pluginEntity), element);
+            List<String> events = EventHanlderScanner.getEvents(roundEnv);
+            String pluginSrc = generatePluginSource(generateCommandExecutors(pluginEntity),
+                    EventHanlderScanner.getEvents(roundEnv),
+                    element);
             BukkitUtils.createNewJavaFile(filer, messager, BukkitUtils.getClassName(element), pluginSrc, Const.SUFFIX_PLUGIN_CLASS );
         }
         return true;
     }
 
-    private String generatePluginSource(Map<String, String> commandExecutorsClasses, Element element) {
-        String imortClasses = generateCommandExecutorImport(commandExecutorsClasses.values());
+    private String generatePluginSource(Map<String, String> commandExecutorsClasses, List<String> events, Element element) {
+        String iportClasses = generateCommandExecutorImport(commandExecutorsClasses.values(), events);
         String commandEx = generategetCommand(commandExecutorsClasses);
-        return MessageFormat.format(Const.COMMAND_EXECUTOR_HEADER, BukkitUtils.getPackageName(element), imortClasses, BukkitUtils.getClassName(element),commandEx );
+        String eventsEx = EventHanlderScanner.generateEventsHandler(events);
+        return MessageFormat.format(Const.COMMAND_EXECUTOR_HEADER,
+                                        BukkitUtils.getPackageName(element),
+                                        iportClasses,
+                                        BukkitUtils.getClassName(element),
+                                        commandEx,
+                                        eventsEx);
     }
 
     private String generategetCommand(Map<String, String> commandExecutorsClasses) {
@@ -64,11 +73,15 @@ public class GeneratePlugin extends AbstractProcessor{
         return sb.toString();
     }
 
-    private String generateCommandExecutorImport(Collection<String> commandExecutorsClasses) {
+    private String generateCommandExecutorImport(Collection<String> commandExecutorsClasses, List<String> events) {
         StringBuilder sb = new StringBuilder();
         for (String executorsClass : commandExecutorsClasses) {
-            sb.append(MessageFormat.format(Const.IMPORT_EXECUTOR, executorsClass));
+            sb.append(MessageFormat.format(Const.IMPORT, executorsClass));
         }
+        for (String event : events) {
+            sb.append(MessageFormat.format(Const.IMPORT, event));
+        }
+
         return sb.toString();
 
     }
