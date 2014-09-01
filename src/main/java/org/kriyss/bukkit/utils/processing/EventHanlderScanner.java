@@ -1,7 +1,8 @@
-package org.kriyss.bukkit.utils.processing.utils;
+package org.kriyss.bukkit.utils.processing;
 
 import com.google.common.collect.Lists;
 import org.bukkit.event.EventHandler;
+import org.kriyss.bukkit.utils.processing.utils.BukkitUtils;
 
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
