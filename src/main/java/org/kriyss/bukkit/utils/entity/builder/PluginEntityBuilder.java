@@ -7,7 +7,7 @@ import org.kriyss.bukkit.utils.entity.PluginEntity;
 import java.util.List;
 
 /**
- * Created on 27/08/2014.
+ * Created by kriyss on 02/09/2014.
  */
 public class PluginEntityBuilder {
     private String name;
@@ -15,6 +15,7 @@ public class PluginEntityBuilder {
     private String completeClassName;
     private List<CommandGroupEntity> commandGroups;
     private PermissionEntity permission;
+    private List<String> eventHandler;
 
     private PluginEntityBuilder() {
     }
@@ -48,6 +49,11 @@ public class PluginEntityBuilder {
         return this;
     }
 
+    public PluginEntityBuilder withEventHandler(List<String> eventHandler) {
+        this.eventHandler = eventHandler;
+        return this;
+    }
+
     public PluginEntity build() {
         PluginEntity pluginEntity = new PluginEntity();
         pluginEntity.setName(name);
@@ -55,6 +61,7 @@ public class PluginEntityBuilder {
         pluginEntity.setCompleteClassName(completeClassName);
         pluginEntity.setCommandGroups(commandGroups);
         pluginEntity.setPermission(permission);
+        pluginEntity.setEventHandler(eventHandler);
         return pluginEntity;
     }
 }

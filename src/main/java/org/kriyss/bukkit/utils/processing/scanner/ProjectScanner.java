@@ -31,7 +31,18 @@ public class ProjectScanner {
         throw new IllegalArgumentException("You can't instanciate ProjectScanner");
     }
 
-    public static List<String> scanEvents(RoundEnvironment roundEnv) {
+    public static PluginEntity scanPlugin(RoundEnvironment roundEnv, Element element) {
+        Plugin plugin = element.getAnnotation(Plugin.class);
+        return PluginEntityBuilder.aPluginEntity()
+                .withName(getValueOrDefault(element, plugin.name()))
+                .withVersion(plugin.version())
+                .withCompleteClassName(element.toString())
+                .withEventHandler(scanEvents(roundEnv))
+                .withCommandGroups(scanCommandGroup(roundEnv))
+                .build();
+    }
+
+    private static List<String> scanEvents(RoundEnvironment roundEnv) {
         final Set<? extends Element> elementsAnnotatedWith = roundEnv.getElementsAnnotatedWith(EventHandler.class);
         List<String> events = Lists.newArrayList();
         for (Element element : elementsAnnotatedWith) {
@@ -39,17 +50,6 @@ public class ProjectScanner {
             if (!events.contains(name)) events.add(name);
         }
         return events;
-    }
-
-
-    public static PluginEntity scanPlugin(RoundEnvironment roundEnv, Element element) {
-        Plugin plugin = element.getAnnotation(Plugin.class);
-        return PluginEntityBuilder.aPluginEntity()
-                .withName(getValueOrDefault(element, plugin.name()))
-                .withVersion(plugin.version())
-                .withCompleteClassName(element.toString())
-                .withCommandGroups(scanCommandGroup(roundEnv))
-                .build();
     }
 
     private static List<CommandGroupEntity> scanCommandGroup(RoundEnvironment roundEnv) {

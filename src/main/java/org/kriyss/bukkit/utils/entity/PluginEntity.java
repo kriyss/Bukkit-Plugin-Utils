@@ -10,6 +10,7 @@ public class PluginEntity implements HasPermission{
     private String completeClassName;
     private List<CommandGroupEntity> commandGroups;
     private PermissionEntity permission;
+    private List<String> eventHandler;
 
     public String getName() {
         return name;
@@ -51,6 +52,14 @@ public class PluginEntity implements HasPermission{
         return permission;
     }
 
+    public List<String> getEventHandler() {
+        return eventHandler;
+    }
+
+    public void setEventHandler(List<String> eventHandler) {
+        this.eventHandler = eventHandler;
+    }
+
     @Override
     public String toString() {
         return Objects.toStringHelper(this)
@@ -59,6 +68,8 @@ public class PluginEntity implements HasPermission{
                 .add("completeClassName", completeClassName)
                 .add("commandGroups", commandGroups)
                 .add("permission", permission)
+                .add("permission", eventHandler)
                 .toString();
     }
+
 }

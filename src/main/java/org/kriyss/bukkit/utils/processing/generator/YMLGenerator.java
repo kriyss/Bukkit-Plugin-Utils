@@ -6,9 +6,9 @@ import org.kriyss.bukkit.utils.entity.*;
 
 import static java.text.MessageFormat.format;
 
-public class PluginYMLGenerator {
+public class YMLGenerator {
 
-    private PluginYMLGenerator() {
+    private YMLGenerator() {
         // YOUUU SHAAALLLL NOOOOOTTTTT INSTANNCCIIIAAAATTTEEE MMEEEEEEE!!!!
     }
 
