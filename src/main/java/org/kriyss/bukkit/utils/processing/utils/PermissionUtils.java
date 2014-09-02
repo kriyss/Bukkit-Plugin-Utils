@@ -37,4 +37,17 @@ public class PermissionUtils {
         }
         return permissionMessage;
     }
+
+    public static boolean getPermissionConsole(HasPermission... permissions) {
+        for (HasPermission permission : permissions) {
+            if(permission != null && permission.getPermission() != null && permission.getPermission().isForConsole()) return true;
+        }
+        return false;
+    }
+    public static boolean getPermissionAdmin(HasPermission... permissions) {
+        for (HasPermission permission : permissions) {
+            if(permission != null && permission.getPermission() != null && permission.getPermission().isForAdmin()) return true;
+        }
+        return false;
+    }
 }

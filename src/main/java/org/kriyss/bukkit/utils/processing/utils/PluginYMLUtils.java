@@ -55,11 +55,13 @@ public class PluginYMLUtils {
         String permission = PermissionUtils.generatePermission(plugin.getName(), plugin, group, command);
         if (StringUtils.isNotBlank(permission)) {
             String permissionMessage = PermissionUtils.getPermissionMessage(command, group);
+            boolean isAdmin = PermissionUtils.getPermissionConsole(plugin, group, command);
+            boolean isConsole = PermissionUtils.getPermissionAdmin(plugin, group, command);
             command.setPermission(PermissionEntityBuilder.aPermissionEntity()
                     .withValue(permission)
                     .withMessage(permissionMessage)
-                    .withForAdmin(true)
-                    .withForConsole(true)
+                    .withForAdmin(isAdmin)
+                    .withForConsole(isConsole)
                     .build());
             sb.append(format(COMMAND_YML_PERMISSION, permission));
             sb.append(format(COMMAND_YML_PERMISSION_MESSAGE, permissionMessage));
