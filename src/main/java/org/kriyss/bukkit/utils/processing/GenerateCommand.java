@@ -34,7 +34,7 @@ public class GenerateCommand {
                     + "\t@Override\n"
                     + "\tpublic boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) '{'\n"
                     + "\t\tList<String> errors = new ArrayList<String>();\n"
-                    + "\t\t // Variables declaration\n\t\t{4}\n"
+                    + "\t\t // Variables declaration\n{4}\n"
                     + "{5}\n"
                     + "\t\tif(!errors.isEmpty()) '{' \n"
                     + "\t\t\tfor(String message : errors)'{' \n"
