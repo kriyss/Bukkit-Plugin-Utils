@@ -6,6 +6,7 @@ import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
 import org.kriyss.bukkit.utils.entity.ParamEntity;
 import org.kriyss.bukkit.utils.entity.PluginEntity;
 import org.kriyss.bukkit.utils.processing.utils.BukkitUtils;
+import org.kriyss.bukkit.utils.processing.utils.FileSaver;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
@@ -97,7 +98,7 @@ public class CommandGenerator {
     private String generateCommandExecutor(CommandGroupEntity groupEntity, CommandEntity commandEntity) {
         String src = generate(groupEntity, commandEntity);
         final String commandExecutorcompleteClass = BukkitUtils.getCompleteCommandExecutorClass(groupEntity, commandEntity);
-        BukkitUtils.createNewJavaFile(filer, messager, commandExecutorcompleteClass, src, SUFFIX_COMMAND_CLASS);
+        new FileSaver(filer, messager).createNewJavaFile(commandExecutorcompleteClass, src, SUFFIX_COMMAND_CLASS);
         return commandExecutorcompleteClass;
     }
 

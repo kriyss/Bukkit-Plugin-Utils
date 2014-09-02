@@ -48,10 +48,7 @@ class GeneratePlugin extends AbstractProcessor{
             final Map<String, String> executorsClasses = new CommandGenerator(filer, messager).generateCommandExecutors(pluginEntity);
             String pluginSrc = PluginGenerator.generate(executorsClasses, element, pluginEntity.getEventHandler());
 
-            saver.createNewJavaFile(
-                    BukkitUtils.getClassName(element),
-                    pluginSrc,
-                    PluginGenerator.SUFFIX_PLUGIN_CLASS );
+            saver.createNewJavaFile(BukkitUtils.getClassName(element), pluginSrc, PluginGenerator.SUFFIX_PLUGIN_CLASS );
         }
         return true;
     }
