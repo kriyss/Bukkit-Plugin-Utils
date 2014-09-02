@@ -18,6 +18,9 @@ public class FileSaver {
         this.messager = messager;
     }
 
+    public FileSaver() {
+    }
+
     public void createNewPluginConfigFile(String sourceCode, String fileName) {
         try {
             FileObject sourceFile = filer.createResource(StandardLocation.SOURCE_OUTPUT, "", fileName);

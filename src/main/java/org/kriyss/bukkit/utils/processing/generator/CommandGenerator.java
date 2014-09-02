@@ -17,13 +17,6 @@ import java.util.Map;
  * Created by kriyss on 02/09/2014.
  */
 public class CommandGenerator {
-    private final Filer filer;
-    private final Messager messager;
-
-    public CommandGenerator(Filer filer, Messager messager) {
-        this.filer = filer;
-        this.messager = messager;
-    }
 
     private static final String SUFFIX_COMMAND_CLASS = "Executor";
     private static final String PERM_SRC =  "\t\tif (!commandSender.hasPermission(\"{0}\")) '{' errors.add(ChatColor.RED + \"{1}\");'}' else if(!haveRight)'{' haveRight = true; '}'\n";
@@ -83,22 +76,22 @@ public class CommandGenerator {
             + "\t\tif({0} > {2})\n"
             + "\t\t\terrors.add(\"[{0}] has to be smaller than {2}\");\n";
 
-    public Map<String, String> generateCommandExecutors(PluginEntity pluginEntity) {
+    public static Map<String, String> generate(PluginEntity pluginEntity, FileSaver saver) {
         Map<String, String> completeCommandExecutorClass = Maps.newHashMap();
         for (CommandGroupEntity groupEntity : pluginEntity.getCommandGroups()) {
             for (CommandEntity commandEntity : groupEntity.getCommands()) {
                 completeCommandExecutorClass.put(
                         groupEntity.getRootCommand() + commandEntity.getCommandValue(),
-                        generateCommandExecutor(groupEntity, commandEntity) + SUFFIX_COMMAND_CLASS);
+                        generateCommandExecutor(groupEntity, commandEntity, saver) + SUFFIX_COMMAND_CLASS);
             }
         }
         return completeCommandExecutorClass;
     }
 
-    private String generateCommandExecutor(CommandGroupEntity groupEntity, CommandEntity commandEntity) {
+    private static String generateCommandExecutor(CommandGroupEntity groupEntity, CommandEntity commandEntity, FileSaver saver) {
         String src = generate(groupEntity, commandEntity);
         final String commandExecutorcompleteClass = BukkitUtils.getCompleteCommandExecutorClass(groupEntity, commandEntity);
-        new FileSaver(filer, messager).createNewJavaFile(commandExecutorcompleteClass, src, SUFFIX_COMMAND_CLASS);
+        saver.createNewJavaFile(commandExecutorcompleteClass, src, SUFFIX_COMMAND_CLASS);
         return commandExecutorcompleteClass;
     }
 

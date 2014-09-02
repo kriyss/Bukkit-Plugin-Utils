@@ -18,21 +18,18 @@ import java.util.Set;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 @SupportedAnnotationTypes("org.kriyss.bukkit.utils.annotations.Plugin")
-class GeneratePlugin extends AbstractProcessor{
+public class GeneratePlugin extends AbstractProcessor{
 
-    private Filer filer;
-    private Messager messager;
+    private FileSaver saver;
 
     @Override
     public void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
-        messager = processingEnv.getMessager();
-        filer = processingEnv.getFiler();
+        saver = new FileSaver(processingEnv.getFiler(), processingEnv.getMessager());
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        FileSaver saver = new FileSaver(filer, messager);
        // Generation of Plugin
         Set<? extends Element> pluginElements = roundEnv.getElementsAnnotatedWith(Plugin.class);
         BukkitUtils.hasJustOneResult(pluginElements);
@@ -45,18 +42,12 @@ class GeneratePlugin extends AbstractProcessor{
             String ymlSourceCode = YMLGenerator.generate(pluginEntity);
             saver.createNewPluginConfigFile(ymlSourceCode, "plugin.yml");
 
-            final Map<String, String> executorsClasses = new CommandGenerator(filer, messager).generateCommandExecutors(pluginEntity);
+            final Map<String, String> executorsClasses = CommandGenerator.generate(pluginEntity, saver);
             String pluginSrc = PluginGenerator.generate(executorsClasses, element, pluginEntity.getEventHandler());
 
             saver.createNewJavaFile(BukkitUtils.getClassName(element), pluginSrc, PluginGenerator.SUFFIX_PLUGIN_CLASS );
         }
         return true;
     }
-
-
-
-
-
-
 }
 
