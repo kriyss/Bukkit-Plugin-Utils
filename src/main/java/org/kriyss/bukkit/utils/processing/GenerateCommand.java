@@ -34,18 +34,15 @@ public class GenerateCommand {
                     + "\t@Override\n"
                     + "\tpublic boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) '{'\n"
                     + "\t\tList<String> errors = new ArrayList<String>();\n"
-                    + "\t\tboolean haveRight = false;\n"
-                    + "{4}\n"
+                    + "\t\t // Variables declaration\n\t\t{4}\n"
                     + "{5}\n"
-                    + "if(haveRight)'{' errors = new ArrayList<String>();\n"
-                    + "{6}'}'\n"
                     + "\t\tif(!errors.isEmpty()) '{' \n"
                     + "\t\t\tfor(String message : errors)'{' \n"
                     + "\t\t\t\tcommandSender.sendMessage(message);\n"
                     + "\t\t\t'}'\n"
                     + "\t\t\treturn true;\n"
                     + "\t\t'}'\n"
-                    + "\t\treturn super.{7};\n"
+                    + "\t\treturn super.{6};\n"
                     + "\t'}'\n"
                     + "'}'";
     private static final String CHECK_STRING_REQUIRED = "\t\tif(StringUtils.isBlank({0}))'{'\n" +
@@ -75,9 +72,6 @@ public class GenerateCommand {
         String packageTarget = BukkitUtils.getPackageFromCompleteClass(group);
         String className = BukkitUtils.getCommandExecutorClass(group, command);
         String extendsOf = BukkitUtils.getClassFromCompleteName(completeClassName);
-
-        String permissionSrc = generatePermissionSrc(command);
-
         // verfication
         String declaratedVariablesSource = generateVariablesSource(command);
         String checks = generateChecks(command);
@@ -88,26 +82,12 @@ public class GenerateCommand {
                 completeClassName,
                 className,
                 extendsOf,
-                permissionSrc,
                 declaratedVariablesSource,
                 checks,
                 methodCall
                 );
     }
 
-    private static String generatePermissionSrc(CommandEntity command) {
-        StringBuilder sb = new StringBuilder();
-        if(command.getPermission() != null ){
-            if (command.getPermission().isForConsole())
-                sb.append(PERM_CONSO);
-            if (command.getPermission().isForAdmin())
-                sb.append(PERM_ADM);
-            sb.append(MessageFormat.format(PERM_SRC, command.getPermission().getValue(), command.getPermission().getMessage()));
-        }else {
-            sb.append("haveRight = true;");
-        }
-        return sb.toString();
-    }
 
     private static String generateSuperMethodCall(CommandEntity command) {
         StringBuilder sb = new StringBuilder(command.getCommandMethodName()+"(commandSender");
