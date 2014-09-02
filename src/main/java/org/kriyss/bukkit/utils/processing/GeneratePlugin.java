@@ -90,14 +90,14 @@ public class GeneratePlugin extends AbstractProcessor{
             for (CommandEntity commandEntity : groupEntity.getCommands()) {
                 completeCommandExecutorClass.put(
                         groupEntity.getRootCommand() + commandEntity.getCommandValue(),
-                        generateCommandExecutor(pluginEntity, groupEntity, commandEntity) + Const.SUFFIX_COMMAND_CLASS);
+                        generateCommandExecutor(groupEntity, commandEntity) + Const.SUFFIX_COMMAND_CLASS);
             }
         }
         return completeCommandExecutorClass;
     }
 
-    private String generateCommandExecutor(PluginEntity plugin, CommandGroupEntity groupEntity, CommandEntity commandEntity) {
-        String src = GenerateCommand.generate(plugin, groupEntity, commandEntity);
+    private String generateCommandExecutor(CommandGroupEntity groupEntity, CommandEntity commandEntity) {
+        String src = GenerateCommand.generate(groupEntity, commandEntity);
         final String commandExecutorcompleteClass = BukkitUtils.getCompleteCommandExecutorClass(groupEntity, commandEntity);
         BukkitUtils.createNewJavaFile(filer, messager, commandExecutorcompleteClass, src, Const.SUFFIX_COMMAND_CLASS);
         return commandExecutorcompleteClass;

@@ -4,7 +4,6 @@ import org.kriyss.bukkit.utils.Const;
 import org.kriyss.bukkit.utils.entity.CommandEntity;
 import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
 import org.kriyss.bukkit.utils.entity.ParamEntity;
-import org.kriyss.bukkit.utils.entity.PluginEntity;
 import org.kriyss.bukkit.utils.processing.utils.BukkitUtils;
 
 import java.text.MessageFormat;
@@ -71,18 +70,18 @@ public class GenerateCommand {
             + "\t\tif({0} > {2})\n"
             + "\t\t\terrors.add(\"[{0}] has to be smaller than {2}\");\n";
 
-    public static String generate(PluginEntity plugin, CommandGroupEntity group, CommandEntity command) {
+    public static String generate(CommandGroupEntity group, CommandEntity command) {
         String completeClassName = group.getCompleteClassName();
         String packageTarget = BukkitUtils.getPackageFromCompleteClass(group);
         String className = BukkitUtils.getCommandExecutorClass(group, command);
         String extendsOf = BukkitUtils.getClassFromCompleteName(completeClassName);
 
-        //TODO permission avant !!!!
+        String permissionSrc = generatePermissionSrc(command);
+
         // verfication
         String declaratedVariablesSource = generateVariablesSource(command);
         String checks = generateChecks(command);
         String methodCall = generateSuperMethodCall(command);
-        String permissionSrc = generatePermissionSrc(command);
 
         return MessageFormat.format(COMMAND_EXECUTOR_PATTERN,
                 packageTarget,
@@ -104,6 +103,8 @@ public class GenerateCommand {
             if (command.getPermission().isForAdmin())
                 sb.append(PERM_ADM);
             sb.append(MessageFormat.format(PERM_SRC, command.getPermission().getValue(), command.getPermission().getMessage()));
+        }else {
+            sb.append("haveRight = true;");
         }
         return sb.toString();
     }
