@@ -13,7 +13,7 @@ public class PermissionHelper {
     private PermissionHelper() {
     }
 
-    public static String generatePermission(String pluginName, HasPermission... permissions) {
+    private static String generatePermission(String pluginName, HasPermission... permissions) {
         String separator = ".";
         StringBuilder sb = new StringBuilder(pluginName).append(separator);
         for (HasPermission perm : permissions) {
@@ -27,7 +27,7 @@ public class PermissionHelper {
         return permission.equals(pluginName) ? "" : permission;
     }
 
-    public static String getPermissionMessage(HasPermission... permissions) {
+    private static String getPermissionMessage(HasPermission... permissions) {
         String permissionMessage = Const.DEFAULT_FORBIDEN_MESSAGE;
         for (HasPermission perm : permissions) {
             final String message = perm.getPermission().getMessage();
@@ -39,7 +39,7 @@ public class PermissionHelper {
         return permissionMessage;
     }
 
-    public static boolean getPermissionConsole(HasPermission... permissions) {
+    private static boolean getPermissionConsole(HasPermission... permissions) {
         for (HasPermission permission : permissions) {
             if (permission != null && permission.getPermission() != null)
                 return permission.getPermission().isForConsole();
@@ -47,7 +47,7 @@ public class PermissionHelper {
         return false;
     }
 
-    public static boolean getPermissionAdmin(HasPermission... permissions) {
+    private static boolean getPermissionAdmin(HasPermission... permissions) {
         for (HasPermission permission : permissions) {
             if (permission != null && permission.getPermission() != null)
                 return permission.getPermission().isForAdmin();

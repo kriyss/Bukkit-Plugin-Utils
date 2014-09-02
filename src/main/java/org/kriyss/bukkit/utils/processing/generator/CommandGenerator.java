@@ -16,8 +16,8 @@ import java.util.Map;
  * Created by kriyss on 02/09/2014.
  */
 public class CommandGenerator {
-    private Filer filer;
-    private Messager messager;
+    private final Filer filer;
+    private final Messager messager;
 
     public CommandGenerator(Filer filer, Messager messager) {
         this.filer = filer;
@@ -101,7 +101,7 @@ public class CommandGenerator {
         return commandExecutorcompleteClass;
     }
 
-    public static String generate(CommandGroupEntity group, CommandEntity command) {
+    private static String generate(CommandGroupEntity group, CommandEntity command) {
         String completeClassName = group.getCompleteClassName();
         String packageTarget = BukkitUtils.getPackageFromCompleteClass(group);
         String className = BukkitUtils.getCommandExecutorClass(group, command);

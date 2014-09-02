@@ -1,7 +1,6 @@
 package org.kriyss.bukkit.utils.processing.generator;
 
 import org.apache.commons.lang.StringUtils;
-import org.kriyss.bukkit.utils.Const;
 import org.kriyss.bukkit.utils.entity.*;
 
 import static java.text.MessageFormat.format;

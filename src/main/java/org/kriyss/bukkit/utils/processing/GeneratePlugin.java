@@ -1,6 +1,5 @@
 package org.kriyss.bukkit.utils.processing;
 
-import org.kriyss.bukkit.utils.Const;
 import org.kriyss.bukkit.utils.annotations.Plugin;
 import org.kriyss.bukkit.utils.entity.PluginEntity;
 import org.kriyss.bukkit.utils.processing.generator.CommandGenerator;
@@ -18,7 +17,7 @@ import java.util.Set;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 @SupportedAnnotationTypes("org.kriyss.bukkit.utils.annotations.Plugin")
-public class GeneratePlugin extends AbstractProcessor{
+class GeneratePlugin extends AbstractProcessor{
 
     private Filer filer;
     private Messager messager;

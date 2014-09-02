@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-public class XmlReader {
+class XmlReader {
     private static final String FILE_NAME = "properties.xml";
     private static Properties properties;
 
@@ -13,7 +13,7 @@ public class XmlReader {
         if (null == properties) load();
     }
 
-    public void load(){
+    void load(){
         try {
             FileInputStream fileInput = new FileInputStream(new File(FILE_NAME));
             properties = new Properties();

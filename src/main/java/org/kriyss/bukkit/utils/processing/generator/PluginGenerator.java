@@ -1,6 +1,5 @@
 package org.kriyss.bukkit.utils.processing.generator;
 
-import org.kriyss.bukkit.utils.Const;
 import org.kriyss.bukkit.utils.processing.utils.BukkitUtils;
 
 import javax.lang.model.element.Element;
@@ -64,7 +63,7 @@ public class PluginGenerator {
         return sb.toString();
     }
 
-    public static String generateEventsHandler(List<String> events) {
+    private static String generateEventsHandler(List<String> events) {
         StringBuilder sb = new StringBuilder();
         for (String event : events) {
             sb.append(MessageFormat.format(REGISTER_LISTENER, BukkitUtils.getClassFromCompleteName(event)));
