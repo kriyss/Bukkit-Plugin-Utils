@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class PluginGenerator {
 
-    private static final String SUFFIX_PLUGIN_CLASS = "Launcher";
+    public static final String SUFFIX_PLUGIN_CLASS = "Launcher";
 
     private static final String COMMAND_EXECUTOR_HEADER =
             "package {0};\n\n"
@@ -34,7 +34,7 @@ public class PluginGenerator {
     private static final String REGISTER_LISTENER = "\t\tgetServer().getPluginManager().registerEvents(new {0}(), this);\n";
 
 
-    public String generate(Map<String, String> commandExecutorsClasses, Element element, List<String> events) {
+    public static String generate(Map<String, String> commandExecutorsClasses, Element element, List<String> events) {
         String importClasses = generateImports(commandExecutorsClasses.values(), events);
         String commandEx = generategetCommand(commandExecutorsClasses);
         String eventsEx = generateEventsHandler(events);
@@ -46,14 +46,14 @@ public class PluginGenerator {
                 eventsEx);
     }
 
-    private String generategetCommand(Map<String, String> commandExecutorsClasses) {
+    private static String generategetCommand(Map<String, String> commandExecutorsClasses) {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> executorsClass : commandExecutorsClasses.entrySet()) {
             sb.append(MessageFormat.format(GET_COMMAND, executorsClass.getKey(), BukkitUtils.getClassFromCompleteName(executorsClass.getValue())));
         }
         return sb.toString();
     }
-    private String generateImports(Collection<String> commandExecutorsClasses, List<String> events) {
+    private static String generateImports(Collection<String> commandExecutorsClasses, List<String> events) {
         StringBuilder sb = new StringBuilder();
         for (String executorsClass : commandExecutorsClasses) {
             sb.append(MessageFormat.format(IMPORT, executorsClass));

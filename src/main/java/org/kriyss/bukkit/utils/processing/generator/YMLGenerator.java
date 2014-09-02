@@ -13,7 +13,7 @@ public class YMLGenerator {
     }
 
     private static final String TAB                             = "    ";
-    private static final String YML_HEADER                      = "name: {0}\nmain: {1}"+Const.SUFFIX_PLUGIN_CLASS+"\nversion: {2}\n";
+    private static final String YML_HEADER                      = "name: {0}\nmain: {1}"+PluginGenerator.SUFFIX_PLUGIN_CLASS+"\nversion: {2}\n";
     private static final String COMMAND_YML_HEADER              = "commands: \n";
     private static final String COMMAND_YML_NAME                = TAB + "{0}:\n";
     private static final String COMMAND_YML_DESCRIPTION         = TAB + TAB + "description: {0}\n";

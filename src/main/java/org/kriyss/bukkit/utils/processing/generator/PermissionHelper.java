@@ -1,4 +1,4 @@
-package org.kriyss.bukkit.utils.processing;
+package org.kriyss.bukkit.utils.processing.generator;
 
 import org.apache.commons.lang.StringUtils;
 import org.kriyss.bukkit.utils.Const;
