@@ -6,8 +6,9 @@ import org.kriyss.bukkit.utils.annotations.Plugin;
 import org.kriyss.bukkit.utils.entity.CommandEntity;
 import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
 import org.kriyss.bukkit.utils.entity.PluginEntity;
+import org.kriyss.bukkit.utils.processing.scanner.ProjectScanner;
 import org.kriyss.bukkit.utils.processing.utils.BukkitUtils;
-import org.kriyss.bukkit.utils.processing.utils.PluginYMLUtils;
+import org.kriyss.bukkit.utils.processing.generator.PluginYMLGenerator;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -40,11 +41,18 @@ public class GeneratePlugin extends AbstractProcessor{
         BukkitUtils.hasJustOneResult(pluginElements);
 
         for (Element element : pluginElements) {
-            PluginEntity pluginEntity = ProjectScanner.getPluginEntityBuilder(roundEnv, element);
-            BukkitUtils.createNewPluginConfigFile(filer, messager, PluginYMLUtils.generateConfigFileSource(pluginEntity));
+            // get All information
+            // generates files
+            // generate yml
+            PluginEntity pluginEntity = ProjectScanner.scanPlugin(roundEnv, element);
+            pluginEntity = PermissionHelper.populatePermissions(pluginEntity);
+
+            String ymlSourceCode = PluginYMLGenerator.generateConfigFileSource(pluginEntity);
+
+            BukkitUtils.createNewPluginConfigFile(filer, messager, ymlSourceCode, "plugin.yml");
 
             final Map<String, String> executorsClasses = generateCommandExecutors(pluginEntity);
-            final List<String> events = EventHanlderScanner.getEvents(roundEnv);
+            final List<String> events = ProjectScanner.scanEvents(roundEnv);
             String pluginSrc = generatePluginSource(executorsClasses, events,element);
 
             BukkitUtils.createNewJavaFile(filer, messager, BukkitUtils.getClassName(element), pluginSrc, Const.SUFFIX_PLUGIN_CLASS );

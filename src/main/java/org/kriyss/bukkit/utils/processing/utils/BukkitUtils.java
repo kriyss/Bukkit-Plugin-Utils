@@ -23,11 +23,9 @@ public class BukkitUtils {
 
     private BukkitUtils() {}
 
-    public static void createNewPluginConfigFile(Filer filer, Messager messager, String sourceCode) {
+    public static void createNewPluginConfigFile(Filer filer, Messager messager, String sourceCode, String fileName) {
         try {
-            messager.printMessage(Diagnostic.Kind.NOTE, "Generate Plugin.yml file");
-
-            FileObject sourceFile = filer.createResource(StandardLocation.SOURCE_OUTPUT, "", "plugin.yml");
+            FileObject sourceFile = filer.createResource(StandardLocation.SOURCE_OUTPUT, "", fileName);
             Writer writer = sourceFile.openWriter();
             writer.write(sourceCode);
             writer.close();

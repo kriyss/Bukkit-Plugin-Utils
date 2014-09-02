@@ -1,18 +1,14 @@
-package org.kriyss.bukkit.utils.processing.utils;
+package org.kriyss.bukkit.utils.processing.generator;
 
 import org.apache.commons.lang.StringUtils;
 import org.kriyss.bukkit.utils.Const;
-import org.kriyss.bukkit.utils.entity.CommandEntity;
-import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
-import org.kriyss.bukkit.utils.entity.ParamEntity;
-import org.kriyss.bukkit.utils.entity.PluginEntity;
-import org.kriyss.bukkit.utils.entity.builder.PermissionEntityBuilder;
+import org.kriyss.bukkit.utils.entity.*;
 
 import static java.text.MessageFormat.format;
 
-public class PluginYMLUtils {
+public class PluginYMLGenerator {
 
-    private PluginYMLUtils() {
+    private PluginYMLGenerator() {
         // YOUUU SHAAALLLL NOOOOOTTTTT INSTANNCCIIIAAAATTTEEE MMEEEEEEE!!!!
     }
 
@@ -25,54 +21,42 @@ public class PluginYMLUtils {
     private static final String COMMAND_YML_PERMISSION          = TAB + TAB + "permission: {0}\n";
     private static final String COMMAND_YML_PERMISSION_MESSAGE  = TAB + TAB + "permission-message: {0}\n";
 
-    private static final String ARG_COMMAND_PATTERN             = "/{0} ";
     private static final String PARAM_FIELD_PATTERN             = "[{0}] ";
     private static final String PARAM_FIELD_PATTERN_OPTIONNAL   = "[{0}(optionnal)] ";
+    private static final String PARAM_COMMAND_PATTERN           = "/{0} ";
 
-    public static String generateConfigFileSource(PluginEntity plug) {
+    public static String generateConfigFileSource(PluginEntity plugin) {
         StringBuilder ymlFileBuilder =
                 new StringBuilder(format(YML_HEADER,
-                        plug.getName(),
-                        plug.getCompleteClassName(),
-                        plug.getVersion()))
+                        plugin.getName(),
+                        plugin.getCompleteClassName(),
+                        plugin.getVersion()))
                     .append(COMMAND_YML_HEADER);
-
-        for (CommandGroupEntity groupEntity : plug.getCommandGroups()) {
-            for (CommandEntity commandEntity : groupEntity.getCommands()) {
-                ymlFileBuilder.append(getCommandYmlPart(groupEntity, commandEntity, plug));
+        for (CommandGroupEntity group : plugin.getCommandGroups()) {
+            for (CommandEntity command : group.getCommands()) {
+                ymlFileBuilder.append(getCommandYmlPart(group, command));
             }
         }
         return ymlFileBuilder.toString();
     }
 
-    private static String getCommandYmlPart(CommandGroupEntity group, CommandEntity command, PluginEntity plugin) {
+    private static String getCommandYmlPart(CommandGroupEntity group, CommandEntity command) {
         // This part are always valued
         StringBuilder sb = new StringBuilder(format(COMMAND_YML_NAME, group.getRootCommand() + command.getCommandValue()));
         sb.append(format(COMMAND_YML_DESCRIPTION, command.getDescription()));
         sb.append(format(COMMAND_YML_USAGE, getUsage(group, command)));
 
+        PermissionEntity perm = command.getPermission();
         // Permission may be optionnal
-        String permission = PermissionUtils.generatePermission(plugin.getName(), plugin, group, command);
-        if (StringUtils.isNotBlank(permission)) {
-            String permissionMessage = PermissionUtils.getPermissionMessage(command, group);
-            boolean isAdmin = PermissionUtils.getPermissionConsole(command, group, plugin);
-            boolean isConsole = PermissionUtils.getPermissionAdmin(command, group, plugin);
-            command.setPermission(PermissionEntityBuilder.aPermissionEntity()
-                    .withValue(permission)
-                    .withMessage(permissionMessage)
-                    .withForAdmin(isAdmin)
-                    .withForConsole(isConsole)
-                    .build());
-            sb.append(format(COMMAND_YML_PERMISSION, permission));
-            sb.append(format(COMMAND_YML_PERMISSION_MESSAGE, permissionMessage));
-        } else {
-            command.setPermission(null);
+        if (null != perm && StringUtils.isNotBlank(perm.getValue())) {
+            sb.append(format(COMMAND_YML_PERMISSION, command.getPermission().getValue()));
+            sb.append(format(COMMAND_YML_PERMISSION_MESSAGE, command.getPermission().getMessage()));
         }
         return sb.toString();
     }
 
     private static String getUsage(CommandGroupEntity groupEntity, CommandEntity commandEntity) {
-        StringBuilder sbArg = new StringBuilder(format(ARG_COMMAND_PATTERN, groupEntity.getRootCommand() + commandEntity.getCommandValue()));
+        StringBuilder sbArg = new StringBuilder(format(PARAM_COMMAND_PATTERN, groupEntity.getRootCommand() + commandEntity.getCommandValue()));
         for (ParamEntity paramEntity : commandEntity.getParamEntities()) {
             sbArg.append(format(paramEntity.isRequired() ? PARAM_FIELD_PATTERN : PARAM_FIELD_PATTERN_OPTIONNAL, paramEntity.getName()));
         }

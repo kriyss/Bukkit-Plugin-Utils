@@ -1,7 +1,8 @@
-package org.kriyss.bukkit.utils.processing;
+package org.kriyss.bukkit.utils.processing.scanner;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.event.EventHandler;
 import org.kriyss.bukkit.utils.annotations.Plugin;
 import org.kriyss.bukkit.utils.annotations.command.Command;
 import org.kriyss.bukkit.utils.annotations.command.CommandGroup;
@@ -11,6 +12,7 @@ import org.kriyss.bukkit.utils.annotations.permission.Console;
 import org.kriyss.bukkit.utils.annotations.permission.Permission;
 import org.kriyss.bukkit.utils.entity.*;
 import org.kriyss.bukkit.utils.entity.builder.*;
+import org.kriyss.bukkit.utils.processing.utils.BukkitUtils;
 
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
@@ -19,39 +21,55 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import java.util.List;
+import java.util.Set;
 
 import static org.kriyss.bukkit.utils.processing.utils.BukkitUtils.*;
 
 public class ProjectScanner {
 
-    public static PluginEntity getPluginEntityBuilder(RoundEnvironment roundEnv, Element element) {
+    private ProjectScanner() {
+        throw new IllegalArgumentException("You can't instanciate ProjectScanner");
+    }
+
+    public static List<String> scanEvents(RoundEnvironment roundEnv) {
+        final Set<? extends Element> elementsAnnotatedWith = roundEnv.getElementsAnnotatedWith(EventHandler.class);
+        List<String> events = Lists.newArrayList();
+        for (Element element : elementsAnnotatedWith) {
+            final String name = BukkitUtils.getCompleteClassName(element.getEnclosingElement());
+            if (!events.contains(name)) events.add(name);
+        }
+        return events;
+    }
+
+
+    public static PluginEntity scanPlugin(RoundEnvironment roundEnv, Element element) {
         Plugin plugin = element.getAnnotation(Plugin.class);
         return PluginEntityBuilder.aPluginEntity()
                 .withName(getValueOrDefault(element, plugin.name()))
                 .withVersion(plugin.version())
                 .withCompleteClassName(element.toString())
-                .withCommandGroups(getCommandGroupEntities(roundEnv))
+                .withCommandGroups(scanCommandGroup(roundEnv))
                 .build();
     }
 
-    private static List<CommandGroupEntity> getCommandGroupEntities(RoundEnvironment roundEnv) {
-        List<CommandGroupEntity> commandGroupEntities = Lists.newArrayList();
+    private static List<CommandGroupEntity> scanCommandGroup(RoundEnvironment roundEnv) {
+        List<CommandGroupEntity> commandGroup = Lists.newArrayList();
         for (Element commGr : roundEnv.getElementsAnnotatedWith(CommandGroup.class)) {
-            commandGroupEntities.add(populateCommandGroup(commGr));
+            commandGroup.add(populateCommandGroup(commGr));
         }
-        return commandGroupEntities;
+        return commandGroup;
     }
 
     private static CommandGroupEntity populateCommandGroup(Element commGr) {
         return CommandGroupEntityBuilder.aCommandGroupEntity()
                 .withCompleteClassName(commGr.toString())
                 .withRootCommand(commGr.getAnnotation(CommandGroup.class).value())
-                .withCommands(getCommandEntities(commGr))
+                .withCommands(scanCommand(commGr))
                 .withPermission(populatePermission(commGr))
                 .build();
     }
 
-    private static List<CommandEntity> getCommandEntities(Element commandGroupClass) {
+    private static List<CommandEntity> scanCommand(Element commandGroupClass) {
         List<CommandEntity> commandEntities = Lists.newArrayList();
         for (Element method : commandGroupClass.getEnclosedElements()) {
             if (containsAnnotation(method, Command.class)){
@@ -61,7 +79,7 @@ public class ProjectScanner {
         return commandEntities;
     }
 
-    private static List<ParamEntity> getParamEntities(Element elementmethod) {
+    private static List<ParamEntity> scanParam(Element elementmethod) {
         List<ParamEntity> paramEntities = Lists.newArrayList();
         if(elementmethod.getKind() == ElementKind.METHOD) {
             for (VariableElement parameter : ((ExecutableElement) elementmethod).getParameters()) {
@@ -91,7 +109,7 @@ public class ProjectScanner {
                 .withCommandValue(getValueOrDefault(methodElement, command.name()))
                 .withDescription(command.description())
                 .withPermission(populatePermission(methodElement))
-                .withParamEntities(getParamEntities(methodElement))
+                .withParamEntities(scanParam(methodElement))
                 .build();
     }
 
