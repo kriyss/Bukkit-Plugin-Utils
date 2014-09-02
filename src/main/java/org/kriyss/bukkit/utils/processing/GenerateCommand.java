@@ -10,6 +10,7 @@ import java.text.MessageFormat;
 
 public class GenerateCommand {
 
+    private static final String SUFFIX_COMMAND_CLASS = "Executor";
     private static final String PERM_SRC =  "\t\tif (!commandSender.hasPermission(\"{0}\")) '{' errors.add(ChatColor.RED + \"{1}\");'}' else if(!haveRight)'{' haveRight = true; '}'\n";
     private static final String PERM_CONSO =  "\t\tif (!(commandSender instanceof Player)) { errors.add(ChatColor.RED + \"You aren't CONSOLE\");}else if(!haveRight){ haveRight = true; }\n";
     private static final String PERM_ADM =  "\t\tif (!commandSender.isOp()) { errors.add(ChatColor.RED + \"You aren't OP.\");}else if(!haveRight){ haveRight = true; }\n\n";
@@ -29,7 +30,7 @@ public class GenerateCommand {
                     + "import org.bukkit.ChatColor;\n"
                     + "import org.bukkit.command.CommandSender;\n\n"
                     + "public class {2}"
-                    + Const.SUFFIX_COMMAND_CLASS
+                    +  SUFFIX_COMMAND_CLASS
                     +"  extends {3} implements CommandExecutor'{'\n"
                     + "\t@Override\n"
                     + "\tpublic boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) '{'\n"

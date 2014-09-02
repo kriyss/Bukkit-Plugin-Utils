@@ -12,6 +12,7 @@ import org.kriyss.bukkit.utils.annotations.permission.Console;
 import org.kriyss.bukkit.utils.annotations.permission.Permission;
 import org.kriyss.bukkit.utils.entity.*;
 import org.kriyss.bukkit.utils.entity.builder.*;
+import org.kriyss.bukkit.utils.processing.PermissionHelper;
 import org.kriyss.bukkit.utils.processing.utils.BukkitUtils;
 
 import javax.annotation.processing.RoundEnvironment;
@@ -33,13 +34,14 @@ public class ProjectScanner {
 
     public static PluginEntity scanPlugin(RoundEnvironment roundEnv, Element element) {
         Plugin plugin = element.getAnnotation(Plugin.class);
-        return PluginEntityBuilder.aPluginEntity()
+        PluginEntity pluginEntity = PluginEntityBuilder.aPluginEntity()
                 .withName(getValueOrDefault(element, plugin.name()))
                 .withVersion(plugin.version())
                 .withCompleteClassName(element.toString())
                 .withEventHandler(scanEvents(roundEnv))
                 .withCommandGroups(scanCommandGroup(roundEnv))
                 .build();
+        return PermissionHelper.populatePermissions(pluginEntity);
     }
 
     private static List<String> scanEvents(RoundEnvironment roundEnv) {

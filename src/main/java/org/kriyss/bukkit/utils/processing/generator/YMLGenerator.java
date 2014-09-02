@@ -25,7 +25,7 @@ public class YMLGenerator {
     private static final String PARAM_FIELD_PATTERN_OPTIONNAL   = "[{0}(optionnal)] ";
     private static final String PARAM_COMMAND_PATTERN           = "/{0} ";
 
-    public static String generateConfigFileSource(PluginEntity plugin) {
+    public static String generate(PluginEntity plugin) {
         StringBuilder ymlFileBuilder =
                 new StringBuilder(format(YML_HEADER,
                         plugin.getName(),
