@@ -23,33 +23,6 @@ public class BukkitUtils {
 
     private BukkitUtils() {}
 
-    public static void createNewPluginConfigFile(Filer filer, Messager messager, String sourceCode, String fileName) {
-        try {
-            FileObject sourceFile = filer.createResource(StandardLocation.SOURCE_OUTPUT, "", fileName);
-            Writer writer = sourceFile.openWriter();
-            writer.write(sourceCode);
-            writer.close();
-        } catch (IOException e) {
-            messager.printMessage(Diagnostic.Kind.ERROR, e.getMessage());
-        }
-    }
-
-    public static void createNewJavaFile(Filer filer, Messager messager, String completeClass, String sourceCode, String suffix) {
-        try {
-            String name = completeClass + suffix;
-
-            JavaFileObject sourceFile = filer.createSourceFile(name);
-
-            Writer writer = sourceFile.openWriter();
-            writer.write(sourceCode);
-            writer.close();
-
-            messager.printMessage(Diagnostic.Kind.NOTE, "generation of "+ name + " done!!");
-
-        } catch (IOException e) {
-            messager.printMessage(Diagnostic.Kind.ERROR, e.getMessage());
-        }
-    }
     public static void hasJustOneResult(Set<?> elements) {
         if (elements.size() > 1 ){
             throw new IllegalArgumentException("Multiple Annotations found");

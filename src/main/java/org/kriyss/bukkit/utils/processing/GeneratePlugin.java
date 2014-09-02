@@ -7,6 +7,7 @@ import org.kriyss.bukkit.utils.processing.generator.PluginGenerator;
 import org.kriyss.bukkit.utils.processing.generator.YMLGenerator;
 import org.kriyss.bukkit.utils.processing.scanner.ProjectScanner;
 import org.kriyss.bukkit.utils.processing.utils.BukkitUtils;
+import org.kriyss.bukkit.utils.processing.utils.FileSaver;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -31,6 +32,7 @@ class GeneratePlugin extends AbstractProcessor{
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        FileSaver saver = new FileSaver(filer, messager);
        // Generation of Plugin
         Set<? extends Element> pluginElements = roundEnv.getElementsAnnotatedWith(Plugin.class);
         BukkitUtils.hasJustOneResult(pluginElements);
@@ -41,14 +43,12 @@ class GeneratePlugin extends AbstractProcessor{
 
             // create YML file
             String ymlSourceCode = YMLGenerator.generate(pluginEntity);
-            BukkitUtils.createNewPluginConfigFile(filer, messager, ymlSourceCode, "plugin.yml");
+            saver.createNewPluginConfigFile(ymlSourceCode, "plugin.yml");
 
             final Map<String, String> executorsClasses = new CommandGenerator(filer, messager).generateCommandExecutors(pluginEntity);
             String pluginSrc = PluginGenerator.generate(executorsClasses, element, pluginEntity.getEventHandler());
 
-            BukkitUtils.createNewJavaFile(
-                    filer,
-                    messager,
+            saver.createNewJavaFile(
                     BukkitUtils.getClassName(element),
                     pluginSrc,
                     PluginGenerator.SUFFIX_PLUGIN_CLASS );
