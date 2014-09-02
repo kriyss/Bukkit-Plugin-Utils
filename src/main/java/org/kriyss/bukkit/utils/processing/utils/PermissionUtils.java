@@ -22,7 +22,8 @@ public class PermissionUtils {
                 sb.append(perm.getPermission().getValue()).append(separator);
             }
         }
-        return sb.substring(0, sb.lastIndexOf(separator));
+        final String permission = sb.substring(0, sb.lastIndexOf(separator));
+        return permission.equals(pluginName) ? "" : permission;
     }
 
     public static String getPermissionMessage(HasPermission... permissions){

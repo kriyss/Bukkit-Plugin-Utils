@@ -2,10 +2,11 @@ package org.kriyss.bukkit.utils.processing.utils;
 
 import org.apache.commons.lang.StringUtils;
 import org.kriyss.bukkit.utils.Const;
-import org.kriyss.bukkit.utils.entity.ParamEntity;
 import org.kriyss.bukkit.utils.entity.CommandEntity;
 import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
+import org.kriyss.bukkit.utils.entity.ParamEntity;
 import org.kriyss.bukkit.utils.entity.PluginEntity;
+import org.kriyss.bukkit.utils.entity.builder.PermissionEntityBuilder;
 
 import static java.text.MessageFormat.format;
 
@@ -23,7 +24,6 @@ public class PluginYMLUtils {
     private static final String COMMAND_YML_USAGE               = TAB + TAB + "usage: {0}\n";
     private static final String COMMAND_YML_PERMISSION          = TAB + TAB + "permission: {0}\n";
     private static final String COMMAND_YML_PERMISSION_MESSAGE  = TAB + TAB + "permission-message: {0}\n";
-
 
     private static final String ARG_COMMAND_PATTERN             = "/{0} ";
     private static final String PARAM_FIELD_PATTERN             = "[{0}] ";
@@ -54,8 +54,17 @@ public class PluginYMLUtils {
         // Permission may be optionnal
         String permission = PermissionUtils.generatePermission(plugin.getName(), plugin, group, command);
         if (StringUtils.isNotBlank(permission)) {
+            String permissionMessage = PermissionUtils.getPermissionMessage(command, group);
+            command.setPermission(PermissionEntityBuilder.aPermissionEntity()
+                    .withValue(permission)
+                    .withMessage(permissionMessage)
+                    .withForAdmin(true)
+                    .withForConsole(true)
+                    .build());
             sb.append(format(COMMAND_YML_PERMISSION, permission));
-            sb.append(format(COMMAND_YML_PERMISSION_MESSAGE,PermissionUtils.getPermissionMessage(command, group)));
+            sb.append(format(COMMAND_YML_PERMISSION_MESSAGE, permissionMessage));
+        } else {
+            command.setPermission(null);
         }
         return sb.toString();
     }
