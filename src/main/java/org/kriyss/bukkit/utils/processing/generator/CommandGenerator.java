@@ -5,13 +5,12 @@ import org.kriyss.bukkit.utils.entity.CommandEntity;
 import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
 import org.kriyss.bukkit.utils.entity.ParamEntity;
 import org.kriyss.bukkit.utils.entity.PluginEntity;
-import org.kriyss.bukkit.utils.processing.utils.BukkitUtils;
 import org.kriyss.bukkit.utils.processing.utils.FileSaver;
 
-import javax.annotation.processing.Filer;
-import javax.annotation.processing.Messager;
 import java.text.MessageFormat;
 import java.util.Map;
+
+import static org.kriyss.bukkit.utils.processing.utils.BukkitUtils.*;
 
 /**
  * Created by kriyss on 02/09/2014.
@@ -78,11 +77,11 @@ public class CommandGenerator {
 
     public static Map<String, String> generate(PluginEntity pluginEntity, FileSaver saver) {
         Map<String, String> completeCommandExecutorClass = Maps.newHashMap();
-        for (CommandGroupEntity groupEntity : pluginEntity.getCommandGroups()) {
-            for (CommandEntity commandEntity : groupEntity.getCommands()) {
+        for (CommandGroupEntity group : pluginEntity.getCommandGroups()) {
+            for (CommandEntity command : group.getCommands()) {
                 completeCommandExecutorClass.put(
-                        groupEntity.getRootCommand() + commandEntity.getCommandValue(),
-                        generateCommandExecutor(groupEntity, commandEntity, saver) + SUFFIX_COMMAND_CLASS);
+                        group.getRootCommand() + command.getCommandValue(),
+                        generateCommandExecutor(group, command, saver) + SUFFIX_COMMAND_CLASS);
             }
         }
         return completeCommandExecutorClass;
@@ -90,16 +89,16 @@ public class CommandGenerator {
 
     private static String generateCommandExecutor(CommandGroupEntity groupEntity, CommandEntity commandEntity, FileSaver saver) {
         String src = generate(groupEntity, commandEntity);
-        final String commandExecutorcompleteClass = BukkitUtils.getCompleteCommandExecutorClass(groupEntity, commandEntity);
+        final String commandExecutorcompleteClass = getCompleteCommandExecutorClass(groupEntity, commandEntity);
         saver.createNewJavaFile(commandExecutorcompleteClass, src, SUFFIX_COMMAND_CLASS);
         return commandExecutorcompleteClass;
     }
 
     private static String generate(CommandGroupEntity group, CommandEntity command) {
         String completeClassName = group.getCompleteClassName();
-        String packageTarget = BukkitUtils.getPackageFromCompleteClass(group);
-        String className = BukkitUtils.getCommandExecutorClass(group, command);
-        String extendsOf = BukkitUtils.getClassFromCompleteName(completeClassName);
+        String packageTarget = getPackageFromCompleteClass(group);
+        String className = getCommandExecutorClass(group, command);
+        String extendsOf = getClassFromCompleteName(completeClassName);
         // verfication
         String declaratedVariablesSource = generateVariablesSource(command);
         String checks = generateChecks(command);
@@ -128,9 +127,9 @@ public class CommandGenerator {
     private static String generateChecks(CommandEntity command) {
         StringBuilder checks = new StringBuilder();
         for (ParamEntity paramEntity : command.getParamEntities()) {
-            if (BukkitUtils.isString(paramEntity.getType())) {
+            if (isString(paramEntity.getType())) {
                 checks.append(generateStringChecks(paramEntity));
-            }else if(BukkitUtils.isInteger(paramEntity.getType())){
+            }else if(isInteger(paramEntity.getType())){
                 checks.append(generateIntegerChecks(paramEntity));
             }
         }
@@ -155,9 +154,9 @@ public class CommandGenerator {
         StringBuilder declaratedVariablesSource = new StringBuilder();
         int argsNumber = 0;
         for (ParamEntity paramEntity : command.getParamEntities()) {
-            if (BukkitUtils.isString(paramEntity.getType())) {
+            if (isString(paramEntity.getType())) {
                 declaratedVariablesSource.append(MessageFormat.format(STRING_VARIABLE_DECLARATION, paramEntity.getName(), argsNumber));
-            } else if (BukkitUtils.isInteger(paramEntity.getType())) {
+            } else if (isInteger(paramEntity.getType())) {
                 declaratedVariablesSource.append(MessageFormat.format(INTEGER_VARIABLE_DECLARATION, paramEntity.getName(), argsNumber));
             }
             argsNumber++;

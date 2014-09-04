@@ -25,10 +25,10 @@ public class PluginGenerator {
                     + "{3}\n"
                     + "\t\t// register the differents event handler\n"
                     + "{4}\n"
-                    + "\t'}'\n'}'";
+                    + "\t'}'"
+                    + "\n'}'";
 
     private static final String IMPORT = "import {0};\n";
-
     private static final String GET_COMMAND = "\t\tgetCommand(\"{0}\")" + ".setExecutor(new {1}());\n";
     private static final String REGISTER_LISTENER = "\t\tgetServer().getPluginManager().registerEvents(new {0}(), this);\n";
 
