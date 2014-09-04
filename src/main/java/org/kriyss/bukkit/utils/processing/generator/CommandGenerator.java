@@ -7,6 +7,7 @@ import org.kriyss.bukkit.utils.entity.CommandEntity;
 import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
 import org.kriyss.bukkit.utils.entity.ParamEntity;
 import org.kriyss.bukkit.utils.entity.PluginEntity;
+import org.kriyss.bukkit.utils.entity.exception.InvalidPermissionException;
 import org.kriyss.bukkit.utils.processing.utils.FileSaver;
 import org.kriyss.bukkit.utils.processing.utils.source.*;
 
@@ -27,7 +28,7 @@ public class CommandGenerator {
     private static final String PERM_ADM =  "\t\tif (!commandSender.isOp()) { errors.add(ChatColor.RED + \"You aren't OP.\");}else if(!haveRight){ haveRight = true; }\n\n";
 
     private static final String STRING_VARIABLE_DECLARATION = "\t\tString {0} = ({1} < strings.length) ? strings[{1}] : null;\n";
-    private static final String INTEGER_VARIABLE_DECLARATION = "\t\tInteger {0} = ({1} < strings.length) && NumberUtils.isNumber(strings[{1}]) ? Integer.valueOf(strings[{1}]) : null;\n";
+    private static final String INTEGER_VARIABLE_DECLARATION = "\t\tInteger {0} = ({1} < strings.length) && StringUtils.isNumeric(strings[{1}]) ? Integer.valueOf(strings[{1}]) : null;\n";
     private static final String COMMAND_EXECUTOR_PATTERN =
             "package {0};\n\n"
                     + "import {1};\n"
@@ -99,37 +100,53 @@ public class CommandGenerator {
     }
 
     private static String generate(CommandGroupEntity group, CommandEntity command) {
-
+        String body = generateVariablesSource(command) + "\n checkPermission(sender);\n" + generateSuperMethodCall(command);
         return ClassBuilder.aClassBuilder()
                 .withVisibility(Visibility.PUBLIC)
                 .withClassName(getCommandExecutorClass(group, command) + SUFFIX_COMMAND_CLASS)
                 .withExtendOf(getClassFromCompleteName(group.getCompleteClassName()))
                 .withPackageName(getPackageFromCompleteClass(group))
                 .withImplementsOf(Arrays.asList("org.bukkit.command.CommandExecutor"))
+                .withImports(Arrays.asList(
+                        "org.apache.commons.lang.StringUtils",
+                        InvalidPermissionException.class.getName()))
                 .withMethods(Arrays.asList(
-                        MethodBuilder.aMethod()
+                        Method.MethodBuilder.aMethod()
                                 .withName("onCommand")
                                 .withVisibility(Visibility.PUBLIC)
                                 .withReturnClazz(boolean.class)
-                                .withBody("\t\treturn super."+generateSuperMethodCall(command)+";\n")
+                                .withBody(body)
                                 .withParameters(Arrays.asList(
                                         new Parameter("sender", CommandSender.class),
                                         new Parameter("command", Command.class),
                                         new Parameter("s", String.class),
                                         new Parameter("strings", String.class, true)
                                 ))
-                        .build()
+                                .build(),
+                        Method.MethodBuilder.aMethod()
+                                .withName("checkPermission")
+                                .withVisibility(Visibility.PRIVATE)
+                                .withReturnClazz(void.class)
+//                                .withExceptionsClazz(Arrays.asList(InvalidPermissionException.class.getSimpleName()))
+                                .withBody(MessageFormat.format("\t\tif(!sender.hasPermission(\"{0}\")) throw new InvalidPermissionException(\"{1}\");\n", command.getPermission().getValue(),
+                                        command.getPermission().getMessage()))
+                                .withParameters(Arrays.asList(
+                                        new Parameter("sender", CommandSender.class)
+                                ))
+                                .build()
                 ))
                 .build();
     }
 
 
     private static String generateSuperMethodCall(CommandEntity command) {
-        StringBuilder sb = new StringBuilder(command.getCommandMethodName()+"(sender");
+        StringBuilder sb = new StringBuilder("\t\treturn super.")
+                .append(command.getCommandMethodName())
+                .append("(sender");
         for (ParamEntity paramEntity : command.getParamEntities()) {
             sb.append(", ").append(paramEntity.getName());
         }
-        return sb.append(")").toString();
+        return sb.append(");\n").toString();
     }
 
     private static String generateChecks(CommandEntity command) {

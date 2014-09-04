@@ -101,10 +101,23 @@ public class ClassBuilder {
                     sb.append("[]");
                 sb.append(" ").append(parameter.getName()).append(",");
             }
-            sb.replace(sb.lastIndexOf(","), sb.length(), "){\n")
-                    .append(method.getBody()).append("\t}\n\n");
+            removeLastSemicolon(sb).append(")");
+            if (!method.getExceptionsClazz().isEmpty()) {
+                sb.append(" throws ");
+                for (String clazz : method.getExceptionsClazz()) {
+                    sb.append(clazz).append(",");
+                }
+                removeLastSemicolon(sb);
+            }
+            sb.append("{\n").append(method.getBody()).append("\t}\n\n");
         }
         return sb.append("}\n").toString();
+    }
+
+    private StringBuilder removeLastSemicolon(StringBuilder sb) {
+        if (sb.lastIndexOf(",") ==  sb.length()-1)
+            sb.replace(sb.lastIndexOf(","), sb.length(), "");
+        return sb;
     }
 
 }
