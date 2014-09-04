@@ -6,6 +6,7 @@ import java.util.List;
  * Created on 04/09/2014.
  */
 public class Method {
+    private Visibility visibility;
     private String name;
     private Class<?> returnClazz;
     private List<Parameter> parameters;
@@ -41,5 +42,13 @@ public class Method {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public Visibility getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(Visibility visibility) {
+        this.visibility = visibility;
     }
 }

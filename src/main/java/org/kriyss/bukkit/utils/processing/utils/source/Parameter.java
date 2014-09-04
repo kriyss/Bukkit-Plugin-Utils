@@ -6,28 +6,28 @@ package org.kriyss.bukkit.utils.processing.utils.source;
 public class Parameter {
     private String name;
     private Class<?> clazz;
+    private boolean isArray;
 
     public Parameter(String name, Class<?> clazz) {
         this.name = name;
         this.clazz = clazz;
+        this.isArray = false;
     }
-
-    public Parameter() {
+    public Parameter(String name, Class<?> clazz, boolean isArray) {
+        this.name = name;
+        this.clazz = clazz;
+        this.isArray = isArray;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public Class<?> getClazz() {
         return clazz;
     }
 
-    public void setClazz(Class<?> clazz) {
-        this.clazz = clazz;
+    public boolean isArray() {
+        return isArray;
     }
 }

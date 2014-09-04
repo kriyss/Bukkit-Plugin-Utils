@@ -1,13 +1,17 @@
 package org.kriyss.bukkit.utils.processing.generator;
 
 import com.google.common.collect.Maps;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.kriyss.bukkit.utils.entity.CommandEntity;
 import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
 import org.kriyss.bukkit.utils.entity.ParamEntity;
 import org.kriyss.bukkit.utils.entity.PluginEntity;
 import org.kriyss.bukkit.utils.processing.utils.FileSaver;
+import org.kriyss.bukkit.utils.processing.utils.source.*;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Map;
 
 import static org.kriyss.bukkit.utils.processing.utils.BukkitUtils.*;
@@ -95,29 +99,33 @@ public class CommandGenerator {
     }
 
     private static String generate(CommandGroupEntity group, CommandEntity command) {
-        String completeClassName = group.getCompleteClassName();
-        String packageTarget = getPackageFromCompleteClass(group);
-        String className = getCommandExecutorClass(group, command);
-        String extendsOf = getClassFromCompleteName(completeClassName);
-        // verfication
-        String declaratedVariablesSource = generateVariablesSource(command);
-        String checks = generateChecks(command);
-        String methodCall = generateSuperMethodCall(command);
 
-        return MessageFormat.format(COMMAND_EXECUTOR_PATTERN,
-                packageTarget,
-                completeClassName,
-                className,
-                extendsOf,
-                declaratedVariablesSource,
-                checks,
-                methodCall
-        );
+        return ClassBuilder.aClassBuilder()
+                .withVisibility(Visibility.PUBLIC)
+                .withClassName(getCommandExecutorClass(group, command) + SUFFIX_COMMAND_CLASS)
+                .withExtendOf(getClassFromCompleteName(group.getCompleteClassName()))
+                .withPackageName(getPackageFromCompleteClass(group))
+                .withImplementsOf(Arrays.asList("org.bukkit.command.CommandExecutor"))
+                .withMethods(Arrays.asList(
+                        MethodBuilder.aMethod()
+                                .withName("onCommand")
+                                .withVisibility(Visibility.PUBLIC)
+                                .withReturnClazz(boolean.class)
+                                .withBody("\t\treturn super."+generateSuperMethodCall(command)+";\n")
+                                .withParameters(Arrays.asList(
+                                        new Parameter("sender", CommandSender.class),
+                                        new Parameter("command", Command.class),
+                                        new Parameter("s", String.class),
+                                        new Parameter("strings", String.class, true)
+                                ))
+                        .build()
+                ))
+                .build();
     }
 
 
     private static String generateSuperMethodCall(CommandEntity command) {
-        StringBuilder sb = new StringBuilder(command.getCommandMethodName()+"(commandSender");
+        StringBuilder sb = new StringBuilder(command.getCommandMethodName()+"(sender");
         for (ParamEntity paramEntity : command.getParamEntities()) {
             sb.append(", ").append(paramEntity.getName());
         }
