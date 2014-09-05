@@ -1,5 +1,6 @@
 package org.kriyss.bukkit.utils.processing.generator;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -17,6 +18,7 @@ import org.kriyss.bukkit.utils.processing.utils.source.Visibility;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import static org.kriyss.bukkit.utils.processing.utils.BukkitUtils.*;
@@ -138,12 +140,18 @@ public class CommandGenerator {
     }
 
     private static Method getCheckParameterMethod(CommandEntity command) {
+        List<Parameter> params = Lists.newArrayList();
+        for (ParamEntity paramEntity : command.getParamEntities()) {
+            params.add(new Parameter(paramEntity.getName(), paramEntity.getType().toString()));
+        }
+
         return Method.MethodBuilder.aMethod()
                     .withName("checkParameters")
                     .withVisibility(Visibility.PRIVATE)
                     .withReturnClazz(void.class)
                     .withExceptionsClazz(Arrays.asList(InvalidParameterException.class.getSimpleName()))
-                    .withBody("")
+                    .withParameters(params)
+                    .withBody("System.out.println(\"" + params + "\");")
                     .build();
     }
 
@@ -151,7 +159,9 @@ public class CommandGenerator {
         String body = generateVariablesSource(command)
                 + "\t\ttry {\n"
                 + "\t\t\tcheckPermission(sender);\n"
-                + "\t\t\tcheckParameters();\n"
+                + "\t\t\tcheckParameters("
+                + formatParameter(command.getParamEntities())
+                + ");\n"
                 + "\t\t\t" + generateSuperMethodCall(command)
                 + "\t\t}catch(InvalidParameterException e) {\n"
                 + "\t\t\tsender.sendMessage(ChatColor.YELLOW + e.getMessage());\n"
@@ -172,6 +182,15 @@ public class CommandGenerator {
                             new Parameter("strings", String.class, true)
                     ))
                     .build();
+    }
+
+    private static String formatParameter(List<ParamEntity> paramEntities) {
+        StringBuilder sb = new StringBuilder();
+        for (ParamEntity paramEntity : paramEntities) {
+            sb.append(paramEntity.getName()).append(", ");
+        }
+        return sb.substring(0, sb.lastIndexOf(", ")
+        );
     }
 
 

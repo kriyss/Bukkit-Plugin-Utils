@@ -96,7 +96,7 @@ public class ClassBuilder {
             sb.append("\t").append(method.getVisibility().get()).append(" ").append(method.getReturnClazz().getName()).append(" ").append(method.getName()).append("(");
             List<Parameter> parameters = method.getParameters();
             for (Parameter parameter : parameters) {
-                sb.append(parameter.getClazz().getName());
+                sb.append(parameter.getClazz());
                 if (parameter.isArray())
                     sb.append("[]");
                 sb.append(" ").append(parameter.getName()).append(",");
