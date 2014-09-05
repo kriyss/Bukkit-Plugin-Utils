@@ -70,7 +70,7 @@ public class CommandGenerator {
             "{1} \t\t'}'\n";
 
     private static final String CHECK_STRING = "\t\tif({0}.length() < {1})\n"
-            + "\t\t\t\terrors.add(\"[{0}] has to be highter than {1}\");\n"
+            + "\t\t\t\tthrow new InvalidParameterException(\"[{0}] has to be highter than {1}\");\n"
             + "\t\t\tif({0}.length() > {2})\n"
             + "\t\t\t\terrors.add(\"[{0}] has to be smaller than {2}\");\n";
     private static final String CHECK_INTEGER_REQUIRED = "\t\tif({0} == null)'{'\n" +
@@ -151,7 +151,7 @@ public class CommandGenerator {
                     .withReturnClazz(void.class)
                     .withExceptionsClazz(Arrays.asList(InvalidParameterException.class.getSimpleName()))
                     .withParameters(params)
-                    .withBody("System.out.println(\"" + params + "\");")
+                    .withBody(generateChecks(command))
                     .build();
     }
 
