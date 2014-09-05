@@ -15,7 +15,7 @@ public class PluginGenerator {
 
     public static final String SUFFIX_PLUGIN_CLASS = "Launcher";
 
-    private static final String COMMAND_EXECUTOR_HEADER =
+    private static final String PLUGIN_HEADER =
             "package {0};\n\n"
                     + "{1}\n\n"
                     + "public class {2}" + SUFFIX_PLUGIN_CLASS  +" extends {2} '{'\n"
@@ -37,7 +37,7 @@ public class PluginGenerator {
         String importClasses = generateImports(commandExecutorsClasses.values(), events);
         String commandEx = generategetCommand(commandExecutorsClasses);
         String eventsEx = generateEventsHandler(events);
-        return MessageFormat.format(COMMAND_EXECUTOR_HEADER,
+        return MessageFormat.format(PLUGIN_HEADER,
                 BukkitUtils.getPackageName(element),
                 importClasses,
                 BukkitUtils.getClassName(element),

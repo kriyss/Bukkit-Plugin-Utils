@@ -1,6 +1,6 @@
 package org.kriyss.bukkit.utils.entity.exception;
 
-public class InvalidPermissionException extends Exception{
+public class InvalidPermissionException extends InvalidCallException{
 
     public InvalidPermissionException() {}
 
