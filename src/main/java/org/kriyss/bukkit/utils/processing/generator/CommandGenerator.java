@@ -65,26 +65,26 @@ public class CommandGenerator {
                     + "\t'}'\n"
                     + "'}'";
     private static final String CHECK_STRING_REQUIRED = "\t\tif(StringUtils.isBlank({0}))'{'\n" +
-            "\t\t\terrors.add(\"[{0}] is required\");\n" +
+            "\t\t\tthrow new InvalidParameterException(\"{0} is required\");\n" +
             "\t\t'}' else '{'\n" +
             "{1} \t\t'}'\n";
 
     private static final String CHECK_STRING = "\t\tif({0}.length() < {1})\n"
             + "\t\t\t\tthrow new InvalidParameterException(\"[{0}] has to be highter than {1}\");\n"
             + "\t\t\tif({0}.length() > {2})\n"
-            + "\t\t\t\terrors.add(\"[{0}] has to be smaller than {2}\");\n";
+            + "\t\t\t\tthrow new InvalidParameterException(\"[{0}] has to be smaller than {1}\");\n";
     private static final String CHECK_INTEGER_REQUIRED = "\t\tif({0} == null)'{'\n" +
-            "\t\t\terrors.add(\"[{0}] is required\");\n" +
+            "\t\t\tthrow new InvalidParameterException(\"[{0}] is required\");\n" +
             "\t\t'}' else '{'\n" +
             "{1} \t\t'}'\n";
     private static final String CHECK_INTEGER_NOT_EQUIRED = "\t\tif({0} != null)'{'\n" +
             "{1} \t\t'}'\n";
 
     private static final String CHECK_INTEGER = "\t\tif({0} < {1})\n"
-            + "\t\t\terrors.add(\"[{0}] has to be highter than {1}\");\n"
+            + "\t\t\tthrow new InvalidParameterException(\"[{0}] has to be highter than {1}\");\n"
             + "\t\t\n"
             + "\t\tif({0} > {2})\n"
-            + "\t\t\terrors.add(\"[{0}] has to be smaller than {2}\");\n";
+            + "\t\t\tthrow new InvalidParameterException(\"[{0}] has to be smaller than {2}\");\n";
 
     public static Map<String, String> generate(PluginEntity pluginEntity, FileSaver saver) {
         Map<String, String> completeCommandExecutorClass = Maps.newHashMap();
