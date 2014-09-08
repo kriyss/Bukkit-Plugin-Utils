@@ -27,7 +27,7 @@ public class CommandGenerator {
     private static final String STRING_VARIABLE_DECLARATION = "\t\tString {0} = ({1} < strings.length) ? strings[{1}] : null;\n";
     private static final String INTEGER_VARIABLE_DECLARATION = "\t\tInteger {0} = ({1} < strings.length) && StringUtils.isNumeric(strings[{1}]) ? Integer.valueOf(strings[{1}]) : null;\n";
     private static final String CHECK_STRING_REQUIRED = "\t\tif(StringUtils.isBlank({0}))'{'\n" +
-            "\t\t\tthrow new InvalidParameterException(\"{0} is required\");\n" +
+            "\t\t\tthrow new InvalidParameterException(\"[{0}] is required\");\n" +
             "\t\t'}' else '{'\n" +
             "{1} \t\t'}'\n";
 
