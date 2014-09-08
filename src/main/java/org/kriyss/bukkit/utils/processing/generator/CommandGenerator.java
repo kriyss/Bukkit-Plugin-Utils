@@ -4,10 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.kriyss.bukkit.utils.entity.CommandEntity;
-import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
-import org.kriyss.bukkit.utils.entity.ParamEntity;
-import org.kriyss.bukkit.utils.entity.PluginEntity;
+import org.kriyss.bukkit.utils.entity.*;
 import org.kriyss.bukkit.utils.entity.exception.InvalidParameterException;
 import org.kriyss.bukkit.utils.entity.exception.InvalidPermissionException;
 import org.kriyss.bukkit.utils.processing.utils.FileSaver;
@@ -113,6 +110,7 @@ public class CommandGenerator {
                 .withPackageName(getPackageFromCompleteClass(group))
                 .withImplementsOf(Arrays.asList("org.bukkit.command.CommandExecutor"))
                 .withImports(Arrays.asList(
+                        "org.bukkit.entity.Player",
                         "org.bukkit.ChatColor",
                         "org.apache.commons.lang.StringUtils",
                         InvalidParameterException.class.getName(),
@@ -126,16 +124,16 @@ public class CommandGenerator {
     }
 
     private static Method getCheckPermissionMethod(CommandEntity command) {
+        String permissionBody = "\t\tif(!(sender.isOp() || !(sender instanceof Player) || sender.hasPermission(\"{0}\")))\n" +
+                "\t\t\tthrow new InvalidPermissionException(\"{1}\");\n";
+        PermissionEntity permission = command.getPermission();
         return Method.MethodBuilder.aMethod()
                     .withName("checkPermission")
                     .withVisibility(Visibility.PRIVATE)
                     .withReturnClazz(void.class)
                     .withExceptionsClazz(Arrays.asList(InvalidPermissionException.class.getSimpleName()))
-                    .withBody(MessageFormat.format("\t\tif(!sender.hasPermission(\"{0}\")) throw new InvalidPermissionException(\"{1}\");\n", command.getPermission().getValue(),
-                            command.getPermission().getMessage()))
-                    .withParameters(Arrays.asList(
-                            new Parameter("sender", CommandSender.class)
-                    ))
+                    .withBody(MessageFormat.format(permissionBody, permission.getValue(), permission.getMessage()))
+                    .withParameters(Arrays.asList(new Parameter("sender", CommandSender.class)))
                     .build();
     }
 
