@@ -1,5 +1,6 @@
 package org.kriyss.bukkit.utils.entity.builder;
 
+
 import org.kriyss.bukkit.utils.entity.ParamEntity;
 
 import javax.lang.model.type.TypeMirror;

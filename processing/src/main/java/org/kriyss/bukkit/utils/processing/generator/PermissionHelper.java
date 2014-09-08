@@ -2,7 +2,10 @@ package org.kriyss.bukkit.utils.processing.generator;
 
 import org.apache.commons.lang.StringUtils;
 import org.kriyss.bukkit.utils.Const;
-import org.kriyss.bukkit.utils.entity.*;
+import org.kriyss.bukkit.utils.entity.CommandEntity;
+import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
+import org.kriyss.bukkit.utils.entity.HasPermission;
+import org.kriyss.bukkit.utils.entity.PluginEntity;
 import org.kriyss.bukkit.utils.entity.builder.PermissionEntityBuilder;
 
 /**

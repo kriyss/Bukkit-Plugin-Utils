@@ -1,5 +1,6 @@
 package org.kriyss.bukkit.utils.entity.builder;
 
+
 import org.kriyss.bukkit.utils.entity.PermissionEntity;
 
 /**

@@ -5,8 +5,6 @@ import com.google.common.collect.Maps;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.kriyss.bukkit.utils.entity.*;
-import org.kriyss.bukkit.utils.entity.exception.InvalidParameterException;
-import org.kriyss.bukkit.utils.entity.exception.InvalidPermissionException;
 import org.kriyss.bukkit.utils.processing.utils.FileSaver;
 import org.kriyss.bukkit.utils.processing.utils.source.ClassBuilder;
 import org.kriyss.bukkit.utils.processing.utils.source.Method;
@@ -26,41 +24,8 @@ import static org.kriyss.bukkit.utils.processing.utils.BukkitUtils.*;
 public class CommandGenerator {
 
     private static final String SUFFIX_COMMAND_CLASS = "Executor";
-    private static final String PERM_SRC =  "\t\tif (!commandSender.hasPermission(\"{0}\")) '{' errors.add(ChatColor.RED + \"{1}\");'}' else if(!haveRight)'{' haveRight = true; '}'\n";
-    private static final String PERM_CONSO =  "\t\tif (!(commandSender instanceof Player)) { errors.add(ChatColor.RED + \"You aren't CONSOLE\");}else if(!haveRight){ haveRight = true; }\n";
-    private static final String PERM_ADM =  "\t\tif (!commandSender.isOp()) { errors.add(ChatColor.RED + \"You aren't OP.\");}else if(!haveRight){ haveRight = true; }\n\n";
-
     private static final String STRING_VARIABLE_DECLARATION = "\t\tString {0} = ({1} < strings.length) ? strings[{1}] : null;\n";
     private static final String INTEGER_VARIABLE_DECLARATION = "\t\tInteger {0} = ({1} < strings.length) && StringUtils.isNumeric(strings[{1}]) ? Integer.valueOf(strings[{1}]) : null;\n";
-    private static final String COMMAND_EXECUTOR_PATTERN =
-            "package {0};\n\n"
-                    + "import {1};\n"
-                    + "import org.bukkit.entity.Player;\n"
-                    + "import org.apache.commons.lang.math.NumberUtils;\n"
-                    + "import org.apache.commons.lang.StringUtils;\n"
-                    + "import java.util.List;\n"
-                    + "import java.util.ArrayList;\n"
-                    + "import org.bukkit.command.Command;\n"
-                    + "import org.bukkit.command.CommandExecutor;\n"
-                    + "import org.bukkit.ChatColor;\n"
-                    + "import org.bukkit.command.CommandSender;\n\n"
-                    + "public class {2}"
-                    +  SUFFIX_COMMAND_CLASS
-                    +"  extends {3} implements CommandExecutor'{'\n"
-                    + "\t@Override\n"
-                    + "\tpublic boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) '{'\n"
-                    + "\t\tList<String> errors = new ArrayList<String>();\n"
-                    + "\t\t // Variables declaration\n{4}\n"
-                    + "{5}\n"
-                    + "\t\tif(!errors.isEmpty()) '{' \n"
-                    + "\t\t\tfor(String message : errors)'{' \n"
-                    + "\t\t\t\tcommandSender.sendMessage(message);\n"
-                    + "\t\t\t'}'\n"
-                    + "\t\t\treturn true;\n"
-                    + "\t\t'}'\n"
-                    + "\t\treturn super.{6};\n"
-                    + "\t'}'\n"
-                    + "'}'";
     private static final String CHECK_STRING_REQUIRED = "\t\tif(StringUtils.isBlank({0}))'{'\n" +
             "\t\t\tthrow new InvalidParameterException(\"{0} is required\");\n" +
             "\t\t'}' else '{'\n" +
@@ -113,8 +78,8 @@ public class CommandGenerator {
                         "org.bukkit.entity.Player",
                         "org.bukkit.ChatColor",
                         "org.apache.commons.lang.StringUtils",
-                        InvalidParameterException.class.getName(),
-                        InvalidPermissionException.class.getName()))
+                        "org.kriyss.bukkit.utils.exception.exception.InvalidParameterException",
+                        "org.kriyss.bukkit.utils.exception.exception.InvalidPermissionException"))
                 .withMethods(Arrays.asList(
                         getOnCommandMethod(command),
                         getCheckParameterMethod(command),
@@ -131,7 +96,7 @@ public class CommandGenerator {
                     .withName("checkPermission")
                     .withVisibility(Visibility.PRIVATE)
                     .withReturnClazz(void.class)
-                    .withExceptionsClazz(Arrays.asList(InvalidPermissionException.class.getSimpleName()))
+                    .withExceptionsClazz(Arrays.asList("InvalidPermissionException"))
                     .withBody(MessageFormat.format(permissionBody, permission.getValue(), permission.getMessage()))
                     .withParameters(Arrays.asList(new Parameter("sender", CommandSender.class)))
                     .build();
@@ -147,7 +112,7 @@ public class CommandGenerator {
                     .withName("checkParameters")
                     .withVisibility(Visibility.PRIVATE)
                     .withReturnClazz(void.class)
-                    .withExceptionsClazz(Arrays.asList(InvalidParameterException.class.getSimpleName()))
+                    .withExceptionsClazz(Arrays.asList("org.kriyss.bukkit.utils.exception.exception.InvalidParameterException"))
                     .withParameters(params)
                     .withBody(generateChecks(command))
                     .build();

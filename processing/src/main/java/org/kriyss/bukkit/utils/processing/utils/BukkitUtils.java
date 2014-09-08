@@ -4,16 +4,8 @@ import org.apache.commons.lang.StringUtils;
 import org.kriyss.bukkit.utils.entity.CommandEntity;
 import org.kriyss.bukkit.utils.entity.CommandGroupEntity;
 
-import javax.annotation.processing.Filer;
-import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeMirror;
-import javax.tools.Diagnostic;
-import javax.tools.FileObject;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardLocation;
-import java.io.IOException;
-import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.util.Set;
 
