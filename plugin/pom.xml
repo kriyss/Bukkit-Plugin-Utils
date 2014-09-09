@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>utils</artifactId>
+        <groupId>org.kriyss.bukkit</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>plugin</artifactId>
+    <packaging>pom</packaging>
+
+    <repositories>
+        <repository>
+            <id>bukkit-repo</id>
+            <url>http://repo.bukkit.org/content/groups/public/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.kriyss.bukkit</groupId>
+            <artifactId>processing</artifactId>
+            <version>${org.kriyss.bukkit.plugin.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.kriyss.bukkit</groupId>
+            <artifactId>api</artifactId>
+            <version>${org.kriyss.bukkit.plugin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>${bukkit.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <org.kriyss.bukkit.plugin.version>1.0-SNAPSHOT</org.kriyss.bukkit.plugin.version>
+        <bukkit.version>RELEASE</bukkit.version>
+        <!-- Maven plugins -->
+        <plugin.archetype.version>2.2</plugin.archetype.version>
+        <plugin.clean.version>2.4.1</plugin.clean.version>
+        <plugin.build-helper.version>1.7</plugin.build-helper.version>
+        <plugin.compiler.version>3.1</plugin.compiler.version>
+        <plugin.dependency.version>2.8</plugin.dependency.version>
+        <plugin.assembly.version>2.4</plugin.assembly.version>
+        <plugin.source.version>2.2.1</plugin.source.version>
+        <plugin.javadoc.version>2.9.1</plugin.javadoc.version>
+        <plugin.jar.maven>2.4</plugin.jar.maven>
+
+        <!-- Project properties -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <project.build.javaVersion>1.7</project.build.javaVersion>
+        <project.dir.generated>${project.basedir}/src/main/generated</project.dir.generated>
+        <project.dir.resources>${project.basedir}/src/main/resources</project.dir.resources>
+    </properties>
+
+    <build>
+        <plugins>
+            <!-- ========== Assemble dependency to final jar========== -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+
+                <!-- ========== BUILD HELPER (adds "generated" dir to source folders) ========== -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${plugin.build-helper.version}</version>
+                    <executions>
+                        <execution>
+                            <id>add-source-annot</id>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>add-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>${project.dir.generated}</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <!-- ========== COMPILER (compiles) ========== -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${plugin.compiler.version}</version>
+                    <configuration>
+                        <annotationProcessors>
+                            <annotationProcessor>org.kriyss.bukkit.utils.processing.GeneratePlugin</annotationProcessor>
+                        </annotationProcessors>
+                        <source>${project.build.javaVersion}</source>
+                        <target>${project.build.javaVersion}</target>
+                        <generatedSourcesDirectory>${project.dir.generated}</generatedSourcesDirectory>
+                    </configuration>
+                </plugin>
+                <!-- ========== CLEAN (adds "generated" dir to the clean list) ========== -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${plugin.clean.version}</version>
+                    <executions>
+                        <execution>
+                            <id>clean</id>
+                            <phase>clean</phase>
+                            <goals>
+                                <goal>clean</goal>
+                            </goals>
+                            <configuration>
+                                <verbose>true</verbose>
+                                <filesets>
+                                    <fileset>
+                                        <directory>${project.dir.generated}</directory>
+                                    </fileset>
+                                </filesets>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <phase>compile</phase>
+                            <configuration>
+                                <tasks>
+                                    <copy todir="${project.dir.resources}">
+                                        <fileset dir="${project.dir.generated}">
+                                            <include name="**/*.yml"/>
+                                        </fileset>
+                                    </copy>
+                                </tasks>
+                            </configuration>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>**\*.yml</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+
+</project>

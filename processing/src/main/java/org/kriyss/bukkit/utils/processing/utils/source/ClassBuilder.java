@@ -8,10 +8,10 @@ import java.util.List;
 public class ClassBuilder {
     private Visibility visibility;
     private String packageName;
-    private List<String> imports = Lists.newArrayList();;
+    private List<Class<?>> imports = Lists.newArrayList();;
     private String className;
     private String extendOf;
-    private List<String> implementsOf = Lists.newArrayList();
+    private List<Class<?>> implementsOf = Lists.newArrayList();
     private List<Constant> constants = Lists.newArrayList();;
     private List<Method> methods = Lists.newArrayList();;
 
@@ -32,7 +32,7 @@ public class ClassBuilder {
         return this;
     }
 
-    public ClassBuilder withImports(List<String> imports) {
+    public ClassBuilder withImports(List<Class<?>> imports) {
         this.imports = imports;
         return this;
     }
@@ -47,7 +47,7 @@ public class ClassBuilder {
         return this;
     }
 
-    public ClassBuilder withImplementsOf(List<String> implementsOf) {
+    public ClassBuilder withImplementsOf(List<Class<?>> implementsOf) {
         this.implementsOf = implementsOf;
         return this;
     }
@@ -66,8 +66,10 @@ public class ClassBuilder {
         // PACKAGE
         sb.append("package ").append(packageName).append(";\n\n");
         // IMPORTS
-        for (String anImport : imports) {
-            sb.append("import ").append(anImport).append(";\n");
+        for (Class<?> anImport : imports) {
+            if(null != anImport) {
+                sb.append("import ").append(anImport.getName()).append(";\n");
+            }
         }
         // CLASS DESCRIPTION
         sb.append("\n").append(visibility.get()).append(" class ").append(className);
@@ -76,8 +78,10 @@ public class ClassBuilder {
         }
         if (!implementsOf.isEmpty()){
             sb.append(" implements ");
-            for (String impl : implementsOf) {
-                sb.append(impl).append(",");
+            for (Class<?> impl : implementsOf) {
+                if(null != impl){
+                    sb.append(impl.getSimpleName()).append(",");
+                }
             }
             sb.replace(sb.lastIndexOf(","), sb.length(), "{\n\n");
         }
