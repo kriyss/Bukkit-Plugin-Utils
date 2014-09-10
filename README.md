@@ -11,6 +11,19 @@ He is also inspired by ToHPluginUtils - ZerothAngel's Bukkit plugin library.
 * wiki
 * documentation
 
+## How to use it
+
+Create a new maven project and inherit from this parent : 
+```xml
+    <parent>
+        <groupId>org.kriyss.bukkit</groupId>
+        <artifactId>plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+```
+
+After this, create the Plugin class as below : 
+
 ##Plugin :
 The easiest way to generate a plugin is just putting the annotation `@Plugin` with the version of this one. I would try to automate the version.<br>
 The class where you put `@Plugin` must extends `JavaPlugin`. You could put what do you want on it, the Framework will take it into account.
