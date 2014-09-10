@@ -3,11 +3,12 @@ package org.kriyss.bukkit.utils.reader;
 import java.util.Properties;
 
 public abstract class AbstractPropertyReader {
-    static final String FILE_NAME = "properties.xml";
+    static String FILE_NAME;
 
     protected static Properties properties;
 
-    protected AbstractPropertyReader() {
+    protected AbstractPropertyReader(String filename) {
+        FILE_NAME = filename;
         if (null == properties) load();
     }
 

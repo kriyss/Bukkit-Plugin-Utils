@@ -4,8 +4,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class XmlReader extends AbstractPropertyReader{
+public class XmlPropertyReader extends AbstractPropertyReader{
+
+    private static final Logger LOGGER = Logger.getLogger("XmlPropertyReader");
+
+    public XmlPropertyReader() {
+        super("resources.xml");
+    }
+
+    public XmlPropertyReader(String fileName) {
+        super(fileName);
+    }
 
     @Override
     public void load(){
@@ -15,7 +27,7 @@ public class XmlReader extends AbstractPropertyReader{
             properties.load(fileInput);
             fileInput.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Can't load properties file");
         }
     }
 }
