@@ -37,14 +37,13 @@ public class GeneratePlugin extends AbstractProcessor{
         for (Element element : pluginElements) {
             // get All information
             PluginEntity pluginEntity = ProjectScanner.scanPlugin(roundEnv, element);
-
             // create YML file
             String ymlSourceCode = YMLGenerator.generate(pluginEntity);
             saver.createNewPluginConfigFile(ymlSourceCode, "plugin.yml");
-
+            // create all Executor classes, and retrieve command and class name
             final Map<String, String> executorsClasses = CommandGenerator.generate(pluginEntity, saver);
             String pluginSrc = PluginGenerator.generate(executorsClasses, element, pluginEntity.getEventHandler());
-
+            // create Plugin main class
             saver.createNewJavaFile(BukkitUtils.getClassName(element), pluginSrc, PluginGenerator.SUFFIX_PLUGIN_CLASS );
         }
         return true;

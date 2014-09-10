@@ -8,12 +8,12 @@ import java.util.List;
 public class ClassBuilder {
     private Visibility visibility;
     private String packageName;
-    private List<Class<?>> imports = Lists.newArrayList();;
     private String className;
     private String extendOf;
+    private List<Class<?>> imports = Lists.newArrayList();
     private List<Class<?>> implementsOf = Lists.newArrayList();
-    private List<Constant> constants = Lists.newArrayList();;
-    private List<Method> methods = Lists.newArrayList();;
+    private List<Constant> constants = Lists.newArrayList();
+    private List<Method> methods = Lists.newArrayList();
 
     private ClassBuilder() {
     }

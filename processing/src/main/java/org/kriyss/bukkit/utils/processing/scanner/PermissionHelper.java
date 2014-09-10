@@ -1,4 +1,4 @@
-package org.kriyss.bukkit.utils.processing.generator;
+package org.kriyss.bukkit.utils.processing.scanner;
 
 import org.apache.commons.lang.StringUtils;
 import org.kriyss.bukkit.utils.Const;
@@ -8,9 +8,6 @@ import org.kriyss.bukkit.utils.entity.HasPermission;
 import org.kriyss.bukkit.utils.entity.PluginEntity;
 import org.kriyss.bukkit.utils.entity.builder.PermissionEntityBuilder;
 
-/**
- * Created on 27/08/2014.
- */
 public class PermissionHelper {
 
     private PermissionHelper() {

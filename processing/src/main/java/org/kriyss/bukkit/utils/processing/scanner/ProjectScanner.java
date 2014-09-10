@@ -12,7 +12,6 @@ import org.kriyss.bukkit.utils.annotations.permission.Console;
 import org.kriyss.bukkit.utils.annotations.permission.Permission;
 import org.kriyss.bukkit.utils.entity.*;
 import org.kriyss.bukkit.utils.entity.builder.*;
-import org.kriyss.bukkit.utils.processing.generator.PermissionHelper;
 import org.kriyss.bukkit.utils.processing.utils.BukkitUtils;
 
 import javax.annotation.processing.RoundEnvironment;

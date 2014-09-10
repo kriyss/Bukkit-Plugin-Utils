@@ -8,9 +8,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by kriyss on 02/09/2014.
- */
 public class PluginGenerator {
 
     public static final String SUFFIX_PLUGIN_CLASS = "Launcher";
@@ -34,15 +31,12 @@ public class PluginGenerator {
 
 
     public static String generate(Map<String, String> commandExecutorsClasses, Element element, List<String> events) {
-        String importClasses = generateImports(commandExecutorsClasses.values(), events);
-        String commandEx = generategetCommand(commandExecutorsClasses);
-        String eventsEx = generateEventsHandler(events);
         return MessageFormat.format(PLUGIN_HEADER,
                 BukkitUtils.getPackageName(element),
-                importClasses,
+                generateImports(commandExecutorsClasses.values(), events),
                 BukkitUtils.getClassName(element),
-                commandEx,
-                eventsEx);
+                generategetCommand(commandExecutorsClasses),
+                generateEventsHandler(events));
     }
 
     private static String generategetCommand(Map<String, String> commandExecutorsClasses) {

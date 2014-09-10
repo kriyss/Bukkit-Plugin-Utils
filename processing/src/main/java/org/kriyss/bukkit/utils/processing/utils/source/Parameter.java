@@ -1,12 +1,9 @@
 package org.kriyss.bukkit.utils.processing.utils.source;
 
-/**
- * Created on 04/09/2014.
- */
 public class Parameter {
-    private String name;
-    private String clazz;
-    private boolean isArray;
+    private final String name;
+    private final String clazz;
+    private final boolean isArray;
 
     public Parameter(String name, String clazz) {
         this.name = name;

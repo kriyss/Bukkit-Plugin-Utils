@@ -1,8 +1,5 @@
 package org.kriyss.bukkit.utils.processing.utils.source;
 
-/**
- * Created on 04/09/2014.
- */
 public enum Visibility{
     PUBLIC("public"),
     PACKAGE(""),
@@ -12,7 +9,7 @@ public enum Visibility{
     public String get(){
         return value;
     }
-    private String value;
+    private final String value;
 
     private Visibility(String value) {
         this.value = value;

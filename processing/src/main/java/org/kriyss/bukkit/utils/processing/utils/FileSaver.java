@@ -10,15 +10,12 @@ import java.io.IOException;
 import java.io.Writer;
 
 public class FileSaver {
-    private Filer filer;
-    private Messager messager;
+    private final Filer filer;
+    private final Messager messager;
 
     public FileSaver(Filer filer, Messager messager) {
         this.filer = filer;
         this.messager = messager;
-    }
-
-    public FileSaver() {
     }
 
     public void createNewPluginConfigFile(String sourceCode, String fileName) {
@@ -34,16 +31,11 @@ public class FileSaver {
 
     public void createNewJavaFile(String completeClass, String sourceCode, String suffix) {
         try {
-            String name = completeClass + suffix;
-
-            JavaFileObject sourceFile = filer.createSourceFile(name);
+            JavaFileObject sourceFile = filer.createSourceFile(completeClass + suffix);
 
             Writer writer = sourceFile.openWriter();
             writer.write(sourceCode);
             writer.close();
-
-            messager.printMessage(Diagnostic.Kind.NOTE, "generation of "+ name + " done!!");
-
         } catch (IOException e) {
             messager.printMessage(Diagnostic.Kind.ERROR, e.getMessage());
         }

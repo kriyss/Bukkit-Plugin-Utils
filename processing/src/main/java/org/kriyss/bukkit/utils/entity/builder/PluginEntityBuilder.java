@@ -6,9 +6,6 @@ import org.kriyss.bukkit.utils.entity.PluginEntity;
 
 import java.util.List;
 
-/**
- * Created by kriyss on 02/09/2014.
- */
 public class PluginEntityBuilder {
     private String name;
     private String version;

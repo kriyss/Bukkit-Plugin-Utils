@@ -24,9 +24,6 @@ import java.util.Map;
 
 import static org.kriyss.bukkit.utils.processing.utils.BukkitUtils.*;
 
-/**
- * Created by kriyss on 02/09/2014.
- */
 public class CommandGenerator {
 
     private static final String SUFFIX_COMMAND_CLASS = "Executor";
