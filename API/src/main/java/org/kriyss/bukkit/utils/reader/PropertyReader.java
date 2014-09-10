@@ -5,10 +5,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-public class XmlReader extends AbstractPropertyReader{
+public class PropertyReader extends AbstractPropertyReader{
 
     @Override
-    public void load(){
+    public void load() {
         try {
             FileInputStream fileInput = new FileInputStream(new File(FILE_NAME));
             properties = new Properties();
