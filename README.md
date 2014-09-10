@@ -1,10 +1,8 @@
 Bukkit-Plugin-Utils
 ===================
 
-This is a framework for help to create [Bukkit](http://bukkit.org/) plugins. All work is done in compilation time.
+This is a framework for help to create [Bukkit](http://bukkit.org/) plugins. All works is done at compilation time.
 The framework create automatically the plugin.yml, permissions.yml etc...
-
-He is also inspired by ToHPluginUtils - ZerothAngel's Bukkit plugin library. 
 
 ## TODO :
 * archetype maven
