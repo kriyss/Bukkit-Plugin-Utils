@@ -21,6 +21,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.kriyss.bukkit.utils.processing.utils.BukkitUtils.*;
 
@@ -108,9 +109,10 @@ public class CommandGenerator {
 
     private static Method getCheckParameterMethod(CommandEntity command) {
         List<Parameter> params = Lists.newArrayList();
-        for (ParamEntity paramEntity : command.getParamEntities()) {
-            params.add(new Parameter(paramEntity.getName(), paramEntity.getType().toString()));
-        }
+        params.addAll(command.getParamEntities()
+                                .stream()
+                                    .map(paramEntity -> new Parameter(paramEntity.getName(), paramEntity.getType().toString()))
+                                    .collect(Collectors.toList()));
 
         return Method.MethodBuilder.aMethod()
                     .withName("checkParameters")

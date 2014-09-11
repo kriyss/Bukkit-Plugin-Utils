@@ -22,6 +22,7 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.kriyss.bukkit.utils.processing.utils.BukkitUtils.*;
 
@@ -55,9 +56,10 @@ public class ProjectScanner {
 
     private static List<CommandGroupEntity> scanCommandGroup(RoundEnvironment roundEnv) {
         List<CommandGroupEntity> commandGroup = Lists.newArrayList();
-        for (Element commGr : roundEnv.getElementsAnnotatedWith(CommandGroup.class)) {
-            commandGroup.add(populateCommandGroup(commGr));
-        }
+        commandGroup.addAll(roundEnv.getElementsAnnotatedWith(CommandGroup.class)
+                                .stream()
+                                    .map(ProjectScanner::populateCommandGroup)
+                                    .collect(Collectors.toList()));
         return commandGroup;
     }
 
@@ -72,11 +74,11 @@ public class ProjectScanner {
 
     private static List<CommandEntity> scanCommand(Element commandGroupClass) {
         List<CommandEntity> commandEntities = Lists.newArrayList();
-        for (Element method : commandGroupClass.getEnclosedElements()) {
-            if (containsAnnotation(method, Command.class)){
-                commandEntities.add(populateCommand(method));
-            }
-        }
+        commandEntities.addAll(commandGroupClass.getEnclosedElements()
+                                .stream()
+                                    .filter(method -> containsAnnotation(method, Command.class))
+                                    .map(ProjectScanner::populateCommand)
+                                    .collect(Collectors.toList()));
         return commandEntities;
     }
 

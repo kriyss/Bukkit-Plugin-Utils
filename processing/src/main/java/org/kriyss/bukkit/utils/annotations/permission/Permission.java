@@ -2,10 +2,7 @@ package org.kriyss.bukkit.utils.annotations.permission;
 
 import org.kriyss.bukkit.utils.Const;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.CLASS)
 @Target({ElementType.TYPE, ElementType.METHOD})

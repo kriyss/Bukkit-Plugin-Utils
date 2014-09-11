@@ -66,11 +66,10 @@ public class ClassBuilder {
         // PACKAGE
         sb.append("package ").append(packageName).append(";\n\n");
         // IMPORTS
-        for (Class<?> anImport : imports) {
-            if(null != anImport) {
-                sb.append("import ").append(anImport.getName()).append(";\n");
-            }
-        }
+        imports.stream()
+                .filter(anImport -> null != anImport)
+                .forEach(anImport -> sb.append("import ").append(anImport.getName()).append(";\n"));
+
         // CLASS DESCRIPTION
         sb.append("\n").append(visibility.get()).append(" class ").append(className);
         if (StringUtils.isNotBlank(extendOf)){
@@ -78,11 +77,10 @@ public class ClassBuilder {
         }
         if (!implementsOf.isEmpty()){
             sb.append(" implements ");
-            for (Class<?> impl : implementsOf) {
-                if(null != impl){
-                    sb.append(impl.getSimpleName()).append(",");
-                }
-            }
+            implementsOf.stream()
+                    .filter(impl -> null != impl)
+                    .forEach(impl -> sb.append(impl.getSimpleName()).append(","));
+
             sb.replace(sb.lastIndexOf(","), sb.length(), "{\n\n");
         }
         for (Constant constant : constants) {
